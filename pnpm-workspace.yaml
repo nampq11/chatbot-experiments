@@ -1,0 +1,10 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+catalog:
+  "@sinclair/typebox": 0.34.49
+  "@types/react": 19.2.2
+  "@types/react-dom": 19.2.2
+  openai: 6.38.0
+  partial-json: 0.1.7

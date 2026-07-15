@@ -1,0 +1,50 @@
+{
+  "name": "@dentaltrip-ai/ai",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./providers": {
+      "types": "./dist/providers/register-builtins.d.ts",
+      "import": "./dist/providers/register-builtins.js",
+      "default": "./dist/providers/register-builtins.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "default": "./dist/types.js"
+    },
+    "./event-stream": {
+      "types": "./dist/event-stream.d.ts",
+      "import": "./dist/event-stream.js",
+      "default": "./dist/event-stream.js"
+    }
+  },
+  "scripts": {
+    "build": "pnpm --filter @dentaltrip-ai/llm-core build && tsc -p tsconfig.json",
+    "check-types": "pnpm --filter @dentaltrip-ai/llm-core build && tsc --noEmit",
+    "lint": "pnpm exec biome check --error-on-warnings .",
+    "test": "pnpm --filter @dentaltrip-ai/llm-core build && vitest run"
+  },
+  "dependencies": {
+    "@dentaltrip-ai/llm-core": "workspace:*",
+    "openai": "6.38.0",
+    "partial-json": "0.1.7"
+  },
+  "devDependencies": {
+    "@dentaltrip-ai/typescript-config": "workspace:*",
+    "typescript": "5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

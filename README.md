@@ -1,50 +1,55 @@
-# 🎈 Streamlit + LLM Examples App
+# Chatbot Prototype
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/llm-examples?quickstart=1)
+Standalone DentalTrip AI chat stack extracted from `/home/nampq/workspace/src/dentaltrip/dentaltrip-ai`.
 
-Starter examples for building LLM apps with Streamlit.
+## Structure
 
-## Overview of the App
+- `apps/web` — Next.js App Router host for `/chat` and `/chat/[sessionId]`
+- `packages/server` — Express backend that serves session, message, realtime SSE, health, and readiness APIs
+- `packages/agent-runtime` — runtime that turns persisted user messages into assistant runs
+- `packages/agent-core` — provider-independent agent loop
+- `packages/ai` — Azure OpenAI provider adapter
+- `packages/llm-core` — provider-neutral LLM contracts and stream primitives
+- `packages/core` — domain use cases, events, realtime hub, and session contracts
+- `packages/database` — MySQL repositories and migrations
+- `packages/client` — frontend chat API hooks, identity state, and navigation adapter contracts
+- `packages/ui` — shared UI primitives and CSS tokens used by chat
+- `packages/views` — shared chat page components
+- `packages/protocol` — shared chat/session/realtime schemas
+- `packages/cli` — database migration and local CLI utilities
+- `e2e` — Playwright chat tests
 
-This app showcases a growing collection of LLM minimum working examples.
+## Local development
 
-Current examples include:
-
-- Chatbot
-- File Q&A
-- Chat with Internet search
-- LangChain Quickstart
-- LangChain PromptTemplate
-- Chat with user feedback
-
-## Demo App
-
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://llm-examples.streamlit.app/)
-
-### Get an OpenAI API key
-
-You can get your own OpenAI API key by following the following instructions:
-
-1. Go to https://platform.openai.com/account/api-keys.
-2. Click on the `+ Create new secret key` button.
-3. Next, enter an identifier name (optional) and click on the `Create secret key` button.
-
-### Enter the OpenAI API key in Streamlit Community Cloud
-
-To set the OpenAI API key as an environment variable in Streamlit apps, do the following:
-
-1. At the lower right corner, click on `< Manage app` then click on the vertical "..." followed by clicking on `Settings`.
-2. This brings the **App settings**, next click on the `Secrets` tab and paste the API key into the text box as follows:
-
-```sh
-OPENAI_API_KEY='xxxxxxxxxx'
+```bash
+cp .env.example .env
+pnpm install
+make dev
 ```
 
-## Run it locally
+`make dev` installs dependencies, starts the local MySQL container, runs backend migrations, starts the Express API on `PORT` (default `8080`), then starts the Next.js chat app on `WEB_PORT` (default `3000`).
 
-```sh
-virtualenv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-streamlit run Chatbot.py
+The web app reads `NEXT_PUBLIC_AI_API_URL` and defaults to `http://localhost:8080`.
+
+## Useful commands
+
+```bash
+make setup          # install deps, create server env, start MySQL
+make server         # run backend only
+make start          # start backend + frontend without reinstalling
+make stop           # stop local server/web processes
+make migrate-up     # run database migrations through the CLI
+pnpm check          # format/lint, boundary check, typecheck, unit tests
+pnpm --dir apps/web build
+pnpm test:e2e       # starts full stack through Playwright webServer
+```
+
+## Required runtime environment
+
+Copy `.env.example` to `.env` and fill the Azure OpenAI values before expecting live assistant responses:
+
+```env
+AZURE_OPENAI_ENDPOINT=https://example.openai.azure.com/
+AZURE_OPENAI_API_KEY=your-api-key
+AZURE_OPENAI_API_VERSION=2024-10-21
 ```

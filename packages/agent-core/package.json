@@ -1,0 +1,53 @@
+{
+  "name": "@dentaltrip-ai/agent-core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./agent": {
+      "types": "./dist/agent.d.ts",
+      "import": "./dist/agent.js",
+      "default": "./dist/agent.js"
+    },
+    "./agent-loop": {
+      "types": "./dist/agent-loop.d.ts",
+      "import": "./dist/agent-loop.js",
+      "default": "./dist/agent-loop.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "default": "./dist/types.js"
+    },
+    "./validation": {
+      "types": "./dist/validation.d.ts",
+      "import": "./dist/validation.js",
+      "default": "./dist/validation.js"
+    }
+  },
+  "scripts": {
+    "build": "pnpm --filter @dentaltrip-ai/llm-core build && tsc -p tsconfig.json",
+    "check-types": "pnpm --filter @dentaltrip-ai/llm-core build && tsc --noEmit",
+    "lint": "pnpm exec biome check --error-on-warnings .",
+    "test": "pnpm --filter @dentaltrip-ai/llm-core build && vitest run"
+  },
+  "dependencies": {
+    "@dentaltrip-ai/llm-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@dentaltrip-ai/typescript-config": "workspace:*",
+    "typescript": "5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

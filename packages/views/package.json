@@ -1,0 +1,35 @@
+{
+  "name": "@dentaltrip-ai/views",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./chat": "./src/chat/index.ts"
+  },
+  "scripts": {
+    "lint": "pnpm exec biome check --error-on-warnings .",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@dentaltrip-ai/typescript-config": "workspace:*",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^22.15.3",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "jsdom": "^29.1.1",
+    "typescript": "5.9.2",
+    "vitest": "^3"
+  },
+  "dependencies": {
+    "@dentaltrip-ai/client": "workspace:*",
+    "@dentaltrip-ai/ui": "workspace:*",
+    "@tanstack/react-query": "^5",
+    "dom-serializer": "^3.1.1",
+    "html-react-parser": "^6.1.3",
+    "lucide-react": "^1.16.0",
+    "react": "^19.2.0"
+  }
+}

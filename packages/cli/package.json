@@ -1,0 +1,42 @@
+{
+  "name": "@dentaltrip-ai/cli",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist",
+    "bin",
+    "script",
+    "src"
+  ],
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "bin": {
+    "dentaltrip-ai": "./dist/bin/dentaltrip-ai.js"
+  },
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build:deps": "pnpm --filter @dentaltrip-ai/protocol build && pnpm --filter @dentaltrip-ai/core build && pnpm --filter @dentaltrip-ai/database build && pnpm --filter @dentaltrip-ai/agent-runtime build",
+    "cli": "pnpm run build:deps && tsx bin/dentaltrip-ai.ts",
+    "migrate": "pnpm run build:deps && tsx script/migrate.ts",
+    "build": "pnpm run clean && pnpm run build:deps && tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
+    "lint": "pnpm exec biome check --error-on-warnings .",
+    "check-types": "pnpm run build:deps && tsc -p tsconfig.json --noEmit",
+    "test": "pnpm run build:deps && vitest run"
+  },
+  "dependencies": {
+    "@dentaltrip-ai/agent-runtime": "workspace:*",
+    "@dentaltrip-ai/core": "workspace:*",
+    "@dentaltrip-ai/database": "workspace:*",
+    "@dentaltrip-ai/protocol": "workspace:*",
+    "commander": "^13.1.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "tsc-alias": "^1.8.17",
+    "tsx": "^4.22.3",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

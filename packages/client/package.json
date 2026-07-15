@@ -1,0 +1,33 @@
+{
+  "name": "@dentaltrip-ai/client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./api": "./src/api/index.ts",
+    "./chat": "./src/chat/index.ts",
+    "./identity": "./src/identity/index.ts",
+    "./navigation": "./src/navigation/index.ts"
+  },
+  "scripts": {
+    "lint": "pnpm exec biome check --error-on-warnings .",
+    "test": "pnpm --filter @dentaltrip-ai/protocol build && vitest run",
+    "check-types": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@dentaltrip-ai/typescript-config": "workspace:*",
+    "@types/node": "^22.15.3",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "typescript": "5.9.2",
+    "vitest": "^3"
+  },
+  "dependencies": {
+    "@dentaltrip-ai/protocol": "workspace:*",
+    "@tanstack/react-query": "^5",
+    "react": "^19.2.0",
+    "zod": "^4.4.3",
+    "zustand": "^5"
+  }
+}

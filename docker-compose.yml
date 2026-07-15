@@ -1,0 +1,24 @@
+name: dentaltrip-ai
+
+services:
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "${DB_HOST:-127.0.0.1}:${DB_PORT:-3306}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-password}
+      MYSQL_DATABASE: ${DB_NAME:-dentaltrip}
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -uroot -p$${MYSQL_ROOT_PASSWORD} --silent",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - mysql_data:/var/lib/mysql
+volumes:
+  mysql_data:

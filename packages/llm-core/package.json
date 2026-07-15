@@ -1,0 +1,53 @@
+{
+  "name": "@dentaltrip-ai/llm-core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "default": "./dist/types.js"
+    },
+    "./event-stream": {
+      "types": "./dist/event-stream.d.ts",
+      "import": "./dist/event-stream.js",
+      "default": "./dist/event-stream.js"
+    },
+    "./validation": {
+      "types": "./dist/validation.d.ts",
+      "import": "./dist/validation.js",
+      "default": "./dist/validation.js"
+    },
+    "./diagnostics": {
+      "types": "./dist/diagnostics.d.ts",
+      "import": "./dist/diagnostics.js",
+      "default": "./dist/diagnostics.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check-types": "tsc --noEmit",
+    "lint": "pnpm exec biome check --error-on-warnings .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "0.34.49"
+  },
+  "devDependencies": {
+    "@dentaltrip-ai/typescript-config": "workspace:*",
+    "typescript": "5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

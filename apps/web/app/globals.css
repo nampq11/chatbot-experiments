@@ -1,0 +1,5 @@
+@import "@dentaltrip-ai/ui/styles";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

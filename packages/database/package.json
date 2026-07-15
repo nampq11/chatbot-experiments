@@ -1,0 +1,41 @@
+{
+  "name": "@dentaltrip-ai/database",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./schema": {
+      "types": "./dist/schema/index.d.ts",
+      "import": "./dist/schema/index.js",
+      "default": "./dist/schema/index.js"
+    }
+  },
+  "scripts": {
+    "build": "pnpm --filter @dentaltrip-ai/core build && tsc -p tsconfig.json",
+    "lint": "pnpm exec biome check --error-on-warnings .",
+    "test": "pnpm --filter @dentaltrip-ai/core build && vitest run",
+    "check-types": "pnpm --filter @dentaltrip-ai/core build && tsc --noEmit"
+  },
+  "dependencies": {
+    "@dentaltrip-ai/core": "workspace:*",
+    "drizzle-orm": "^0.44.0",
+    "mysql2": "^3.14.3"
+  },
+  "devDependencies": {
+    "@dentaltrip-ai/typescript-config": "workspace:*",
+    "@types/node": "^22.15.3",
+    "typescript": "5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

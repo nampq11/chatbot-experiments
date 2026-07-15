@@ -1,0 +1,77 @@
+{
+  "name": "@dentaltrip-ai/agent-runtime",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js",
+      "default": "./dist/core/index.js"
+    },
+    "./agent": {
+      "types": "./dist/core/agent.d.ts",
+      "import": "./dist/core/agent.js",
+      "default": "./dist/core/agent.js"
+    },
+    "./agent-session-runtime": {
+      "types": "./dist/core/agent-session-runtime.d.ts",
+      "import": "./dist/core/agent-session-runtime.js",
+      "default": "./dist/core/agent-session-runtime.js"
+    },
+    "./agent-session-service": {
+      "types": "./dist/core/agent-session-service.d.ts",
+      "import": "./dist/core/agent-session-service.js",
+      "default": "./dist/core/agent-session-service.js"
+    },
+    "./resources": {
+      "types": "./dist/resources.d.ts",
+      "import": "./dist/resources.js",
+      "default": "./dist/resources.js"
+    },
+    "./session-actor": {
+      "types": "./dist/core/session-actor.d.ts",
+      "import": "./dist/core/session-actor.js",
+      "default": "./dist/core/session-actor.js"
+    },
+    "./session-manager": {
+      "types": "./dist/core/session-manager.d.ts",
+      "import": "./dist/core/session-manager.js",
+      "default": "./dist/core/session-manager.js"
+    },
+    "./tools": {
+      "types": "./dist/tools/index.d.ts",
+      "import": "./dist/tools/index.js",
+      "default": "./dist/tools/index.js"
+    }
+  },
+  "scripts": {
+    "build": "pnpm --filter @dentaltrip-ai/core build && pnpm --filter @dentaltrip-ai/ai build && pnpm --filter @dentaltrip-ai/agent-core build && tsc -p tsconfig.json",
+    "lint": "pnpm exec biome check --error-on-warnings .",
+    "test": "pnpm --filter @dentaltrip-ai/core build && pnpm --filter @dentaltrip-ai/ai build && pnpm --filter @dentaltrip-ai/agent-core build && vitest run",
+    "check-types": "pnpm --filter @dentaltrip-ai/core build && pnpm --filter @dentaltrip-ai/ai build && pnpm --filter @dentaltrip-ai/agent-core build && tsc --noEmit"
+  },
+  "dependencies": {
+    "@dentaltrip-ai/agent-core": "workspace:*",
+    "@dentaltrip-ai/ai": "workspace:*",
+    "@dentaltrip-ai/core": "workspace:*",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@dentaltrip-ai/typescript-config": "workspace:*",
+    "@types/node": "^22.15.3",
+    "typescript": "5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

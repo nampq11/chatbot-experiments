@@ -1,0 +1,87 @@
+/*
+ * ChatGPT-style thin overlay scrollbar.
+ * Applied via the `.sidebar-scrollbar` utility class.
+ * Targets the sidebar content scroll container specifically.
+ */
+
+/* ── WebKit (Chrome, Edge, Safari) ── */
+.sidebar-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.sidebar-scrollbar:hover {
+  scrollbar-color: hsl(var(--sidebar-foreground) / 0.15) transparent;
+}
+
+/* Track */
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Thumb */
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 0.2s ease;
+}
+
+.sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--sidebar-foreground) / 0.15);
+  background-clip: padding-box;
+}
+
+/* Active (dragging) state */
+.sidebar-scrollbar::-webkit-scrollbar-thumb:active {
+  /* biome-ignore lint/complexity/noImportantStyles: WebKit scrollbar active styles require !important to override the default thumb color. */
+  background-color: hsl(var(--sidebar-foreground) / 0.3) !important;
+}
+
+/* Corner (appears when both axes scroll) */
+.sidebar-scrollbar::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ── Firefox ── */
+/* Firefox uses scrollbar-width / scrollbar-color set above.
+   The hover color change is handled by the .sidebar-scrollbar:hover rule. */
+
+/* ── Active scroll detection (visible while scrolling even without hover) ── */
+.sidebar-scrollbar.scrolling {
+  scrollbar-color: hsl(var(--sidebar-foreground) / 0.15) transparent;
+}
+
+@supports (-moz-appearance: none) {
+  .always-visible-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.35)
+      hsl(var(--muted-foreground) / 0.1);
+  }
+}
+
+.always-visible-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  -webkit-appearance: none;
+}
+
+.always-visible-scrollbar::-webkit-scrollbar-track {
+  background: hsl(var(--muted-foreground) / 0.1);
+  border-radius: 9999px;
+}
+
+.always-visible-scrollbar::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--muted-foreground) / 0.35);
+  border: 2px solid transparent;
+  border-radius: 9999px;
+  background-clip: padding-box;
+}
+
+.always-visible-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--muted-foreground) / 0.5);
+}

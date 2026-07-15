@@ -1,0 +1,7 @@
+{
+  "extends": "@dentaltrip-ai/typescript-config/react-library.json",
+  "compilerOptions": {
+    "baseUrl": "."
+  },
+  "include": ["src"]
+}

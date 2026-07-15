@@ -1,0 +1,46 @@
+{
+  "name": "@dentaltrip-ai/protocol",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./session": {
+      "types": "./src/session.ts",
+      "import": "./dist/session.js",
+      "default": "./dist/session.js"
+    },
+    "./realtime": {
+      "types": "./src/realtime.ts",
+      "import": "./dist/realtime.js",
+      "default": "./dist/realtime.js"
+    },
+    "./agent-run": {
+      "types": "./src/agent-run.ts",
+      "import": "./dist/agent-run.js",
+      "default": "./dist/agent-run.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "pnpm exec biome check --error-on-warnings .",
+    "check-types": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@dentaltrip-ai/typescript-config": "workspace:*",
+    "typescript": "5.9.2"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  }
+}

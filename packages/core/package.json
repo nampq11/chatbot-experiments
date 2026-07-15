@@ -1,0 +1,54 @@
+{
+  "name": "@dentaltrip-ai/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./agent": {
+      "types": "./dist/agent/index.d.ts",
+      "import": "./dist/agent/index.js",
+      "default": "./dist/agent/index.js"
+    },
+    "./events": {
+      "types": "./dist/events/index.d.ts",
+      "import": "./dist/events/index.js",
+      "default": "./dist/events/index.js"
+    },
+    "./realtime": {
+      "types": "./dist/realtime/index.d.ts",
+      "import": "./dist/realtime/index.js",
+      "default": "./dist/realtime/index.js"
+    },
+    "./session": {
+      "types": "./dist/session/index.d.ts",
+      "import": "./dist/session/index.js",
+      "default": "./dist/session/index.js"
+    }
+  },
+  "scripts": {
+    "build": "pnpm --filter @dentaltrip-ai/agent-core build && pnpm --filter @dentaltrip-ai/protocol build && tsc -p tsconfig.json",
+    "lint": "pnpm exec biome check --error-on-warnings .",
+    "test": "pnpm --filter @dentaltrip-ai/agent-core build && pnpm --filter @dentaltrip-ai/protocol build && vitest run",
+    "check-types": "pnpm --filter @dentaltrip-ai/agent-core build && pnpm --filter @dentaltrip-ai/protocol build && tsc --noEmit"
+  },
+  "devDependencies": {
+    "@dentaltrip-ai/typescript-config": "workspace:*",
+    "typescript": "5.9.2",
+    "vitest": "^3"
+  },
+  "dependencies": {
+    "@dentaltrip-ai/agent-core": "workspace:*",
+    "@dentaltrip-ai/protocol": "workspace:*"
+  }
+}

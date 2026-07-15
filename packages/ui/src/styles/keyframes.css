@@ -1,0 +1,182 @@
+@keyframes typing {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-2px);
+    opacity: 1;
+  }
+}
+
+@keyframes loading-dots {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.6);
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes text-blink {
+  0%,
+  100% {
+    color: var(--primary);
+  }
+  50% {
+    color: var(--muted-foreground);
+  }
+}
+
+@keyframes bounce-dots {
+  0%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes thin-pulse {
+  0%,
+  100% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.4;
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-125%);
+    opacity: 0.1;
+  }
+  45% {
+    opacity: 0.65;
+  }
+  100% {
+    transform: translateX(275%);
+    opacity: 0.1;
+  }
+}
+
+@keyframes wave-bars {
+  0%,
+  100% {
+    transform: scaleY(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleY(0.6);
+    opacity: 1;
+  }
+}
+
+@keyframes spinner-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes assistant-wait-indicator-breathe {
+  0%,
+  100% {
+    opacity: 0.74;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes assistant-wait-indicator-shimmer {
+  0% {
+    opacity: 0;
+    transform: translate(-140%, 140%) rotate(18deg);
+  }
+  35% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(140%, -140%) rotate(18deg);
+  }
+}
+@keyframes markdown-stream-token-in {
+  from {
+    opacity: 0.38;
+    transform: translateY(2px);
+  }
+  65% {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.markdown-stream-token {
+  display: inline-block;
+  vertical-align: baseline;
+  animation: markdown-stream-token-in 220ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .markdown-stream-token {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+code {
+  font-family: var(--font-geist-mono);
+  font-feature-settings: var(--default-mono-font-feature-settings);
+  font-variation-settings: var(--default-mono-font-variation-settings);
+}
