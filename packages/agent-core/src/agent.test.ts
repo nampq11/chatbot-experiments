@@ -1,5 +1,13 @@
-import type { AssistantMessage, AssistantMessageEvent, Model, Usage } from "@dentaltrip-ai/llm-core";
-import { AssistantMessageEventStream, Type } from "@dentaltrip-ai/llm-core";
+import type {
+  AssistantMessage,
+  AssistantMessageEvent,
+  Model,
+  Usage,
+} from "@chatbot-experiments/llm-core";
+import {
+  AssistantMessageEventStream,
+  Type,
+} from "@chatbot-experiments/llm-core";
 import { describe, expect, it, vi } from "vitest";
 import { Agent } from "./agent.js";
 import type { AgentTool, StreamFn } from "./types.js";
@@ -39,7 +47,9 @@ function createFinalAssistantMessage(text: string): AssistantMessage {
   };
 }
 
-function createToolAssistantMessage(args: Record<string, unknown>): AssistantMessage {
+function createToolAssistantMessage(
+  args: Record<string, unknown>,
+): AssistantMessage {
   return {
     role: "assistant" as const,
     content: [
@@ -59,7 +69,10 @@ function createToolAssistantMessage(args: Record<string, unknown>): AssistantMes
   };
 }
 
-function createToolThenAnswerStreamFn(): { streamFn: StreamFn; contexts: Array<Parameters<StreamFn>[1]> } {
+function createToolThenAnswerStreamFn(): {
+  streamFn: StreamFn;
+  contexts: Array<Parameters<StreamFn>[1]>;
+} {
   let callCount = 0;
   const contexts: Parameters<StreamFn>[1][] = [];
   const streamFn: StreamFn = (_model, context) => {
@@ -87,7 +100,9 @@ function createToolThenAnswerStreamFn(): { streamFn: StreamFn; contexts: Array<P
   return { streamFn, contexts };
 }
 
-function createSearchTool(execute: AgentTool["execute"] = async () => ({ content: "tool result" })): AgentTool {
+function createSearchTool(
+  execute: AgentTool["execute"] = async () => ({ content: "tool result" }),
+): AgentTool {
   return {
     name: "search",
     label: "Search",
@@ -143,7 +158,10 @@ describe("Agent", () => {
     });
     const deltas: string[] = [];
     agent.subscribe((event) => {
-      if (event.type === "message_update" && event.assistantMessageEvent?.type === "text_delta") {
+      if (
+        event.type === "message_update" &&
+        event.assistantMessageEvent?.type === "text_delta"
+      ) {
         deltas.push(event.assistantMessageEvent.delta);
       }
     });
@@ -210,9 +228,13 @@ describe("Agent", () => {
       assistantMessageEvent?: AssistantMessageEvent;
     }> = [];
     agent.subscribe((event) => {
-      if (event.type === "message_update" && event.message.role === "assistant") {
+      if (
+        event.type === "message_update" &&
+        event.message.role === "assistant"
+      ) {
         const textPart = event.message.content.find(
-          (part): part is { type: "text"; text: string } => part.type === "text",
+          (part): part is { type: "text"; text: string } =>
+            part.type === "text",
         );
         updates.push({
           text: textPart?.text ?? "",
@@ -255,7 +277,9 @@ describe("Agent", () => {
       streamFn: () => new AssistantMessageEventStream(),
     });
 
-    await expect(agent.continue()).rejects.toThrow("Cannot continue from message role: assistant");
+    await expect(agent.continue()).rejects.toThrow(
+      "Cannot continue from message role: assistant",
+    );
   });
   it("does not run follow-up messages after an aborted provider stream", async () => {
     let resolveStreamReady: () => void = () => {};
@@ -348,7 +372,9 @@ describe("Agent", () => {
     await agent.continue();
 
     expect(contexts).toHaveLength(2);
-    expect(contexts[1]?.messages.some((message) => message.role === "toolResult")).toBe(true);
+    expect(
+      contexts[1]?.messages.some((message) => message.role === "toolResult"),
+    ).toBe(true);
     expect(agent.state.messages.at(-1)).toMatchObject({
       role: "assistant",
       content: [{ type: "text", text: "final answer" }],
@@ -408,7 +434,9 @@ describe("Agent", () => {
     await agent.continue();
 
     expect(execute).not.toHaveBeenCalled();
-    expect(agent.state.messages.find((message) => message.role === "toolResult")).toMatchObject({
+    expect(
+      agent.state.messages.find((message) => message.role === "toolResult"),
+    ).toMatchObject({
       role: "toolResult",
       content: [{ type: "text", text: "blocked by policy" }],
       isError: false,

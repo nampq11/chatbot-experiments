@@ -1,4 +1,8 @@
-import type { Message, Session, SessionDataEntry } from "@dentaltrip-ai/core/session";
+import type {
+  Message,
+  Session,
+  SessionDataEntry,
+} from "@chatbot-experiments/core/session";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { messages, sessionData, sessions } from "../schema/index.ts";
 import { DrizzleSessionRepository } from "./session-repository.ts";
@@ -6,7 +10,10 @@ import { DrizzleSessionRepository } from "./session-repository.ts";
 type SessionCountRow = Pick<Session, "messageCount">;
 type QueryRow = Session | Message | SessionDataEntry | SessionCountRow;
 type QueryResult<TRow extends QueryRow> = TRow[] & {
-  then: (resolve: (value: TRow[]) => unknown, reject?: (reason: unknown) => unknown) => Promise<unknown>;
+  then: (
+    resolve: (value: TRow[]) => unknown,
+    reject?: (reason: unknown) => unknown,
+  ) => Promise<unknown>;
   limit: (limit: number) => Promise<TRow[]>;
   orderBy: (..._orderings: unknown[]) => QueryResult<TRow>;
 };
@@ -25,7 +32,10 @@ function isMessageRow(value: unknown): value is Message {
 }
 function isSessionDataRow(value: unknown): value is SessionDataEntry {
   return (
-    isRecord(value) && typeof value.sequence === "number" && typeof value.type === "string" && isRecord(value.payload)
+    isRecord(value) &&
+    typeof value.sequence === "number" &&
+    typeof value.type === "string" &&
+    isRecord(value.payload)
   );
 }
 
@@ -102,7 +112,10 @@ function sortSessionDataRows(rows: SessionDataEntry[]): SessionDataEntry[] {
   return [...rows].sort((a, b) => a.sequence - b.sequence);
 }
 
-function applySessionFilters(rows: Session[], conditionText: string): Session[] {
+function applySessionFilters(
+  rows: Session[],
+  conditionText: string,
+): Session[] {
   let filtered = [...rows];
   const normalizedConditionText = conditionText.replace(/"/g, "");
 
@@ -122,8 +135,13 @@ function applySessionFilters(rows: Session[], conditionText: string): Session[] 
     filtered = filtered.filter((row) => row.id === sessionId);
   }
 
-  if (normalizedConditionText.includes("updated_at =") && normalizedConditionText.includes("id <")) {
-    const cursorUpdatedAtMatch = normalizedConditionText.match(/\bupdated_at = ([^ )]+)/);
+  if (
+    normalizedConditionText.includes("updated_at =") &&
+    normalizedConditionText.includes("id <")
+  ) {
+    const cursorUpdatedAtMatch = normalizedConditionText.match(
+      /\bupdated_at = ([^ )]+)/,
+    );
     const cursorIdMatch = normalizedConditionText.match(/\bid < ([^ )]+)/);
     if (cursorUpdatedAtMatch?.[1] && cursorIdMatch?.[1]) {
       const cursorUpdatedAt = new Date(cursorUpdatedAtMatch[1]);
@@ -131,21 +149,29 @@ function applySessionFilters(rows: Session[], conditionText: string): Session[] 
       filtered = filtered.filter(
         (row) =>
           row.updatedAt.getTime() < cursorUpdatedAt.getTime() ||
-          (row.updatedAt.getTime() === cursorUpdatedAt.getTime() && row.id < cursorId),
+          (row.updatedAt.getTime() === cursorUpdatedAt.getTime() &&
+            row.id < cursorId),
       );
     }
   } else {
-    const cursorUpdatedAtExclusiveMatch = normalizedConditionText.match(/\bupdated_at < ([^ )]+)/);
+    const cursorUpdatedAtExclusiveMatch = normalizedConditionText.match(
+      /\bupdated_at < ([^ )]+)/,
+    );
     if (cursorUpdatedAtExclusiveMatch?.[1]) {
       const cursorUpdatedAt = new Date(cursorUpdatedAtExclusiveMatch[1]);
-      filtered = filtered.filter((row) => row.updatedAt.getTime() < cursorUpdatedAt.getTime());
+      filtered = filtered.filter(
+        (row) => row.updatedAt.getTime() < cursorUpdatedAt.getTime(),
+      );
     }
   }
 
   return filtered;
 }
 
-function applyMessageFilters(rows: Message[], conditionText: string): Message[] {
+function applyMessageFilters(
+  rows: Message[],
+  conditionText: string,
+): Message[] {
   let filtered = [...rows];
 
   const sessionIdMatch = conditionText.match(/\bsession_id = (".*?")/);
@@ -156,7 +182,10 @@ function applyMessageFilters(rows: Message[], conditionText: string): Message[] 
 
   return filtered;
 }
-function applySessionDataFilters(rows: SessionDataEntry[], conditionText: string): SessionDataEntry[] {
+function applySessionDataFilters(
+  rows: SessionDataEntry[],
+  conditionText: string,
+): SessionDataEntry[] {
   let filtered = [...rows];
 
   const sessionIdMatch = conditionText.match(/\bsession_id = (".*?")/);
@@ -176,8 +205,10 @@ function createQueryResult<TRow extends QueryRow>(
   const result = [...snapshot] as QueryResult<TRow>;
 
   // biome-ignore lint/suspicious/noThenProperty: this test helper intentionally mimics Drizzle's thenable query result.
-  result.then = (resolve: (value: TRow[]) => unknown, reject?: (reason: unknown) => unknown) =>
-    Promise.resolve([...snapshot]).then(resolve, reject);
+  result.then = (
+    resolve: (value: TRow[]) => unknown,
+    reject?: (reason: unknown) => unknown,
+  ) => Promise.resolve([...snapshot]).then(resolve, reject);
 
   result.limit = vi.fn(async (limit: number) => snapshot.slice(0, limit));
   result.orderBy = vi.fn((..._orderings: unknown[]) => {
@@ -281,7 +312,10 @@ function createDb() {
             state.sessions[0] = {
               ...session,
               messageCount: session.messageCount + 1,
-              updatedAt: values.updatedAt instanceof Date ? values.updatedAt : session.updatedAt,
+              updatedAt:
+                values.updatedAt instanceof Date
+                  ? values.updatedAt
+                  : session.updatedAt,
             };
           }
         }),
@@ -297,21 +331,33 @@ function createDb() {
             state.queries.push(conditionText);
 
             if (projection?.messageCount !== undefined) {
-              const filtered = applySessionFilters(state.sessions, conditionText).map((row) => ({
+              const filtered = applySessionFilters(
+                state.sessions,
+                conditionText,
+              ).map((row) => ({
                 messageCount: row.messageCount,
               }));
               return createQueryResult(filtered, "sessions");
             }
 
             if (table === messages) {
-              return createQueryResult(applyMessageFilters(state.messages, conditionText), "messages");
+              return createQueryResult(
+                applyMessageFilters(state.messages, conditionText),
+                "messages",
+              );
             }
             if (table === sessionData) {
-              return createQueryResult(applySessionDataFilters(state.sessionData, conditionText), "session_data");
+              return createQueryResult(
+                applySessionDataFilters(state.sessionData, conditionText),
+                "session_data",
+              );
             }
 
             if (table === sessions) {
-              return createQueryResult(applySessionFilters(state.sessions, conditionText), "sessions");
+              return createQueryResult(
+                applySessionFilters(state.sessions, conditionText),
+                "sessions",
+              );
             }
 
             return createQueryResult([], "sessions");
@@ -322,7 +368,9 @@ function createDb() {
   };
 
   return {
-    db: db as unknown as ConstructorParameters<typeof DrizzleSessionRepository>[0],
+    db: db as unknown as ConstructorParameters<
+      typeof DrizzleSessionRepository
+    >[0],
     state,
   };
 }

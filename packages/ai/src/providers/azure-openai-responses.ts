@@ -15,8 +15,11 @@ import type {
   ToolResultMessage,
   Usage,
   UserMessage,
-} from "@dentaltrip-ai/llm-core";
-import { AssistantMessageEventStream, isToolCall } from "@dentaltrip-ai/llm-core";
+} from "@chatbot-experiments/llm-core";
+import {
+  AssistantMessageEventStream,
+  isToolCall,
+} from "@chatbot-experiments/llm-core";
 import { AzureOpenAI } from "openai/azure";
 import type {
   Response as OpenAIResponse,
@@ -68,12 +71,16 @@ function createClient(options?: AzureOpenAIResponsesOptions): AzureOpenAI {
   const apiKey = options?.azureApiKey ?? options?.apiKey;
 
   if (!endpoint || !apiKey) {
-    throw new AIError("Azure OpenAI requires azureEndpoint and azureApiKey stream options.", {
-      provider: "azure-openai",
-    });
+    throw new AIError(
+      "Azure OpenAI requires azureEndpoint and azureApiKey stream options.",
+      {
+        provider: "azure-openai",
+      },
+    );
   }
 
-  const apiVersion = options?.azureApiVersion || DEFAULT_AZURE_RESPONSES_API_VERSION;
+  const apiVersion =
+    options?.azureApiVersion || DEFAULT_AZURE_RESPONSES_API_VERSION;
   const cacheKey = `${endpoint}|${apiVersion}|${apiKey}`;
   if (cachedClient && cachedClientKey === cacheKey) {
     return cachedClient;
@@ -84,13 +91,18 @@ function createClient(options?: AzureOpenAIResponsesOptions): AzureOpenAI {
   return cachedClient;
 }
 
-function resolveDeploymentName(model: Model<"azure-openai-responses">, options?: AzureOpenAIResponsesOptions): string {
+function resolveDeploymentName(
+  model: Model<"azure-openai-responses">,
+  options?: AzureOpenAIResponsesOptions,
+): string {
   return options?.azureDeploymentName || model.id;
 }
 
 function convertImage(part: ImageContent): ResponseInputContent {
   const image = part.image instanceof URL ? part.image.toString() : part.image;
-  const imageUrl = /^[a-z][a-z\d+.-]*:/i.test(image) ? image : `data:${part.mimeType || "image/png"};base64,${image}`;
+  const imageUrl = /^[a-z][a-z\d+.-]*:/i.test(image)
+    ? image
+    : `data:${part.mimeType || "image/png"};base64,${image}`;
 
   return {
     type: "input_image",
@@ -99,7 +111,9 @@ function convertImage(part: ImageContent): ResponseInputContent {
   };
 }
 
-function convertUserContent(content: UserMessage["content"]): ResponseInputContent[] {
+function convertUserContent(
+  content: UserMessage["content"],
+): ResponseInputContent[] {
   if (typeof content === "string") {
     return [{ type: "input_text", text: content }];
   }
@@ -138,7 +152,9 @@ function convertAssistantMessage(message: AssistantMessage): ResponseInput {
   return output;
 }
 
-function convertToolResultMessage(message: ToolResultMessage): ResponseInput[number] {
+function convertToolResultMessage(
+  message: ToolResultMessage,
+): ResponseInput[number] {
   const [callId = message.toolCallId] = message.toolCallId.split("|", 1);
   const text = message.content
     .filter((content): content is TextContent => content.type === "text")
@@ -152,8 +168,11 @@ function convertToolResultMessage(message: ToolResultMessage): ResponseInput[num
   };
 }
 
-/** Converts normalized DentalTrip messages into OpenAI Responses input. */
-export function convertResponsesMessages(model: Model<Api>, context: Context): ResponseInput {
+/** Converts normalized Chatbot Experiments messages into OpenAI Responses input. */
+export function convertResponsesMessages(
+  model: Model<Api>,
+  context: Context,
+): ResponseInput {
   const messages: ResponseInput = [];
 
   if (context.systemPrompt) {
@@ -220,10 +239,17 @@ export function buildResponsesParams(
     params.tools = convertResponsesTools(context.tools);
   }
 
-  if (model.reasoning && (options?.reasoningEffort !== undefined || options?.reasoningSummary !== undefined)) {
-    const reasoning: NonNullable<ResponseCreateParamsStreaming["reasoning"]> = {};
+  if (
+    model.reasoning &&
+    (options?.reasoningEffort !== undefined ||
+      options?.reasoningSummary !== undefined)
+  ) {
+    const reasoning: NonNullable<ResponseCreateParamsStreaming["reasoning"]> =
+      {};
     if (options?.reasoningEffort !== undefined) {
-      reasoning.effort = options.reasoningEffort as NonNullable<ResponseCreateParamsStreaming["reasoning"]>["effort"];
+      reasoning.effort = options.reasoningEffort as NonNullable<
+        ResponseCreateParamsStreaming["reasoning"]
+      >["effort"];
     }
     if (options?.reasoningSummary !== undefined) {
       reasoning.summary = options.reasoningSummary;
@@ -282,7 +308,10 @@ function pushTextDelta(state: ResponsesStreamState, delta: string): void {
   });
 }
 
-function parseFinalToolArguments(toolName: string, rawArguments: string | undefined): Record<string, unknown> {
+function parseFinalToolArguments(
+  toolName: string,
+  rawArguments: string | undefined,
+): Record<string, unknown> {
   const json = rawArguments?.trim() ?? "";
   if (!json) {
     return {};
@@ -297,7 +326,9 @@ function parseFinalToolArguments(toolName: string, rawArguments: string | undefi
   }
 
   if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-    throw new Error(`Invalid final tool arguments for ${toolName}: expected a JSON object.`);
+    throw new Error(
+      `Invalid final tool arguments for ${toolName}: expected a JSON object.`,
+    );
   }
 
   return parsed as Record<string, unknown>;
@@ -328,12 +359,18 @@ function applyTerminalResponse<TApi extends Api>({
   usage.cost = calculateCost(usage, model);
   output.usage = usage;
   output.stopReason = mapStopReason(response.status ?? fallbackStatus);
-  if (output.content.some((block) => isToolCall(block)) && output.stopReason === "stop") {
+  if (
+    output.content.some((block) => isToolCall(block)) &&
+    output.stopReason === "stop"
+  ) {
     output.stopReason = "toolUse";
   }
 }
 
-type ResponsesEvent<TType extends ResponseStreamEvent["type"]> = Extract<ResponseStreamEvent, { type: TType }>;
+type ResponsesEvent<TType extends ResponseStreamEvent["type"]> = Extract<
+  ResponseStreamEvent,
+  { type: TType }
+>;
 
 function getResponseToolCallId(item: { call_id: string; id?: string | null }) {
   return `${item.call_id}|${item.id || item.call_id}`;
@@ -399,7 +436,9 @@ function handleFunctionCallArgumentsDelta<TApi extends Api>(
   }
 
   state.currentBlock.partialArguments = `${state.currentBlock.partialArguments || ""}${event.delta}`;
-  state.currentBlock.arguments = parseStreamingJson(state.currentBlock.partialArguments);
+  state.currentBlock.arguments = parseStreamingJson(
+    state.currentBlock.partialArguments,
+  );
   state.stream.push({
     type: "toolcall_delta",
     contentIndex: getContentIndex(state.output.content),
@@ -417,7 +456,10 @@ function handleFunctionCallArgumentsDone<TApi extends Api>(
   }
 
   state.currentBlock.partialArguments = event.arguments;
-  state.currentBlock.arguments = parseFinalToolArguments(state.currentBlock.name, event.arguments);
+  state.currentBlock.arguments = parseFinalToolArguments(
+    state.currentBlock.name,
+    event.arguments,
+  );
 }
 
 function handleOutputItemDone<TApi extends Api>(
@@ -432,7 +474,9 @@ function handleOutputItemDone<TApi extends Api>(
         return;
       }
 
-      const summary = item.summary?.map((part) => part.text).join("\n\n") || state.currentBlock.thinking;
+      const summary =
+        item.summary?.map((part) => part.text).join("\n\n") ||
+        state.currentBlock.thinking;
       state.currentBlock.thinking = summary;
       state.stream.push({
         type: "thinking_end",
@@ -484,9 +528,13 @@ function handleOutputItemDone<TApi extends Api>(
   }
 }
 
-function createResponseFailedError(event: ResponsesEvent<"response.failed">): Error {
+function createResponseFailedError(
+  event: ResponsesEvent<"response.failed">,
+): Error {
   const error = event.response.error;
-  return new Error(error ? `${error.code}: ${error.message}` : "Azure OpenAI Responses failed");
+  return new Error(
+    error ? `${error.code}: ${error.message}` : "Azure OpenAI Responses failed",
+  );
 }
 
 async function processResponsesStream<TApi extends Api>(
@@ -547,7 +595,9 @@ async function processResponsesStream<TApi extends Api>(
   }
 }
 
-function createEmptyAssistantMessage<TApi extends Api>(model: Model<TApi>): AssistantMessage {
+function createEmptyAssistantMessage<TApi extends Api>(
+  model: Model<TApi>,
+): AssistantMessage {
   return {
     role: "assistant",
     content: [],
@@ -568,7 +618,10 @@ function createEmptyAssistantMessage<TApi extends Api>(model: Model<TApi>): Assi
 }
 
 /** Streams an Azure OpenAI Responses API request. */
-export const streamAzureOpenAIResponses: StreamFunction<"azure-openai-responses", AzureOpenAIResponsesOptions> = (
+export const streamAzureOpenAIResponses: StreamFunction<
+  "azure-openai-responses",
+  AzureOpenAIResponsesOptions
+> = (
   model: Model<"azure-openai-responses">,
   context: Context,
   options?: AzureOpenAIResponsesOptions,
@@ -582,9 +635,12 @@ export const streamAzureOpenAIResponses: StreamFunction<"azure-openai-responses"
       const client = createClient(options);
       const params = buildResponsesParams(model, context, options);
       const payload = (await options?.onPayload?.(params, model)) ?? params;
-      const responseStream = await client.responses.stream(payload as ResponseCreateParamsStreaming, {
-        signal: options?.signal,
-      });
+      const responseStream = await client.responses.stream(
+        payload as ResponseCreateParamsStreaming,
+        {
+          signal: options?.signal,
+        },
+      );
 
       stream.push({ type: "start", partial: output });
       await processResponsesStream(responseStream, {
@@ -602,7 +658,9 @@ export const streamAzureOpenAIResponses: StreamFunction<"azure-openai-responses"
       }
 
       if (output.stopReason === "unknown") {
-        throw new Error("Azure OpenAI Responses stream ended without a terminal response event.");
+        throw new Error(
+          "Azure OpenAI Responses stream ended without a terminal response event.",
+        );
       }
 
       if (output.stopReason === "error") {
@@ -613,12 +671,16 @@ export const streamAzureOpenAIResponses: StreamFunction<"azure-openai-responses"
 
       stream.push({
         type: "done",
-        reason: output.stopReason as Extract<StopReason, "stop" | "length" | "toolUse">,
+        reason: output.stopReason as Extract<
+          StopReason,
+          "stop" | "length" | "toolUse"
+        >,
         message: output,
       });
     } catch (error) {
       output.stopReason = options?.signal?.aborted ? "aborted" : "error";
-      output.errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+      output.errorMessage =
+        error instanceof Error ? error.message : JSON.stringify(error);
       stream.push({ type: "error", reason: output.stopReason, error: output });
     }
   })();
@@ -627,12 +689,21 @@ export const streamAzureOpenAIResponses: StreamFunction<"azure-openai-responses"
 };
 
 /** Streams a simple Azure OpenAI Responses request. */
-export const streamSimpleAzureOpenAIResponses: StreamFunction<"azure-openai-responses", SimpleStreamOptions> = (
+export const streamSimpleAzureOpenAIResponses: StreamFunction<
+  "azure-openai-responses",
+  SimpleStreamOptions
+> = (
   model: Model<"azure-openai-responses">,
   context: Context,
   options?: SimpleStreamOptions,
-): ReturnType<StreamFunction<"azure-openai-responses", SimpleStreamOptions>> => {
-  return streamAzureOpenAIResponses(model, context, options as AzureOpenAIResponsesOptions);
+): ReturnType<
+  StreamFunction<"azure-openai-responses", SimpleStreamOptions>
+> => {
+  return streamAzureOpenAIResponses(
+    model,
+    context,
+    options as AzureOpenAIResponsesOptions,
+  );
 };
 
 /** Azure OpenAI Responses provider registration object. */

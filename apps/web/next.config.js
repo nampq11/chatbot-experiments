@@ -1,7 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
-  transpilePackages: ["@dentaltrip-ai/client", "@dentaltrip-ai/ui", "@dentaltrip-ai/views"],
+  transpilePackages: [
+    "@chatbot-experiments/client",
+    "@chatbot-experiments/ui",
+    "@chatbot-experiments/views",
+  ],
 };
 
 export default nextConfig;

@@ -6,7 +6,7 @@ import {
   SessionInactiveError,
   SessionNotFoundError,
   type SessionRecord,
-} from "@dentaltrip-ai/core/session";
+} from "@chatbot-experiments/core/session";
 import { describe, expect, it, vi } from "vitest";
 import type { ApiRouterDependencies } from "../src/api.ts";
 import { createApp } from "../src/app.ts";
@@ -26,7 +26,9 @@ interface ApiRouterDependencyOverrides extends Partial<SessionDependencies> {
   readonly startAgentRunForUserMessage?: ApiRouterDependencies["startAgentRunForUserMessage"];
 }
 
-function createTestSession(overrides: Partial<SessionRecord> = {}): SessionRecord {
+function createTestSession(
+  overrides: Partial<SessionRecord> = {},
+): SessionRecord {
   return {
     id: "session-1",
     userId: "user-1",
@@ -39,7 +41,9 @@ function createTestSession(overrides: Partial<SessionRecord> = {}): SessionRecor
   };
 }
 
-function createTestMessage(overrides: Partial<MessageRecord> = {}): MessageRecord {
+function createTestMessage(
+  overrides: Partial<MessageRecord> = {},
+): MessageRecord {
   return {
     id: "message-1",
     sessionId: "session-1",
@@ -52,8 +56,11 @@ function createTestMessage(overrides: Partial<MessageRecord> = {}): MessageRecor
   };
 }
 
-function createApiRouterDependencies(overrides?: ApiRouterDependencyOverrides): ApiRouterDependencies {
-  const { startAgentRunForUserMessage = vi.fn(), ...sessionOverrides } = overrides ?? {};
+function createApiRouterDependencies(
+  overrides?: ApiRouterDependencyOverrides,
+): ApiRouterDependencies {
+  const { startAgentRunForUserMessage = vi.fn(), ...sessionOverrides } =
+    overrides ?? {};
   const sessions: SessionDependencies = {
     listSessions: vi.fn(async () => ({ items: [], nextCursor: null })),
     createSession: vi.fn(async () => createTestSession()),
@@ -73,14 +80,18 @@ function createApiRouterDependencies(overrides?: ApiRouterDependencyOverrides): 
 
 async function startTestServer(
   apiRouterDependencies = createApiRouterDependencies(),
-  corsOrigins: CorsOrigin[] = [/^http:\/\/localhost:\d+$/, /^https?:\/\/.*dentaltrip\.io$/],
+  corsOrigins: CorsOrigin[] = [
+    /^http:\/\/localhost:\d+$/,
+    /^https?:\/\/.*chatbot-experiments.local$/,
+  ],
 ): Promise<StartedTestServer> {
   const app = createApp({
     readinessCheck: async () => {},
     corsOrigins,
     apiRouterDependencies,
     realtimeStreamHandler: createRealtimeStreamHandler({
-      validateSessionOwnership: async (sessionId, userId) => sessionId === "session-1" && userId === "user-1",
+      validateSessionOwnership: async (sessionId, userId) =>
+        sessionId === "session-1" && userId === "user-1",
     }),
   });
   const server = createServer(app);
@@ -108,13 +119,19 @@ describe("createApp", () => {
       const localhost = await fetch(`${baseUrl}/health`, {
         headers: { origin: "http://localhost:5173" },
       });
-      expect(localhost.headers.get("access-control-allow-origin")).toBe("http://localhost:5173");
-      expect(localhost.headers.get("access-control-allow-credentials")).toBe("true");
+      expect(localhost.headers.get("access-control-allow-origin")).toBe(
+        "http://localhost:5173",
+      );
+      expect(localhost.headers.get("access-control-allow-credentials")).toBe(
+        "true",
+      );
 
-      const dentalTrip = await fetch(`${baseUrl}/health`, {
-        headers: { origin: "https://app.dentaltrip.io" },
+      const chatbotExperiment = await fetch(`${baseUrl}/health`, {
+        headers: { origin: "https://app.chatbot-experiments.local" },
       });
-      expect(dentalTrip.headers.get("access-control-allow-origin")).toBe("https://app.dentaltrip.io");
+      expect(chatbotExperiment.headers.get("access-control-allow-origin")).toBe(
+        "https://app.chatbot-experiments.local",
+      );
 
       const rejected = await fetch(`${baseUrl}/health`, {
         headers: { origin: "https://example.com" },
@@ -176,12 +193,17 @@ describe("createApp", () => {
     const { server, baseUrl } = await startTestServer();
 
     try {
-      const response = await fetch(`${baseUrl}/api/realtime/stream?session_id=session-1`, {
-        headers: { "x-user-id": "user-1" },
-      });
+      const response = await fetch(
+        `${baseUrl}/api/realtime/stream?session_id=session-1`,
+        {
+          headers: { "x-user-id": "user-1" },
+        },
+      );
 
       expect(response.status).toBe(200);
-      expect(response.headers.get("content-type")).toContain("text/event-stream");
+      expect(response.headers.get("content-type")).toContain(
+        "text/event-stream",
+      );
       expect(response.headers.get("cache-control")).toContain("no-cache");
       response.body?.cancel();
     } finally {
@@ -191,17 +213,22 @@ describe("createApp", () => {
 
   it("starts the agent after appending a persisted user message", async () => {
     const startAgentRunForUserMessage = vi.fn();
-    const { server, baseUrl } = await startTestServer(createApiRouterDependencies({ startAgentRunForUserMessage }));
+    const { server, baseUrl } = await startTestServer(
+      createApiRouterDependencies({ startAgentRunForUserMessage }),
+    );
 
     try {
-      const response = await fetch(`${baseUrl}/api/sessions/session-1/messages`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "x-user-id": "user-1",
+      const response = await fetch(
+        `${baseUrl}/api/sessions/session-1/messages`,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-user-id": "user-1",
+          },
+          body: JSON.stringify({ role: "user", content: "Hello" }),
         },
-        body: JSON.stringify({ role: "user", content: "Hello" }),
-      });
+      );
 
       expect(response.status).toBe(201);
       expect(await response.json()).toMatchObject({
@@ -223,20 +250,28 @@ describe("createApp", () => {
 
   it("does not start the agent after appending a non-user message", async () => {
     const startAgentRunForUserMessage = vi.fn();
-    const appendMessage = vi.fn(async () => createTestMessage({ role: "assistant" }));
+    const appendMessage = vi.fn(async () =>
+      createTestMessage({ role: "assistant" }),
+    );
     const { server, baseUrl } = await startTestServer(
-      createApiRouterDependencies({ appendMessage, startAgentRunForUserMessage }),
+      createApiRouterDependencies({
+        appendMessage,
+        startAgentRunForUserMessage,
+      }),
     );
 
     try {
-      const response = await fetch(`${baseUrl}/api/sessions/session-1/messages`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "x-user-id": "user-1",
+      const response = await fetch(
+        `${baseUrl}/api/sessions/session-1/messages`,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-user-id": "user-1",
+          },
+          body: JSON.stringify({ role: "assistant", content: "Hello" }),
         },
-        body: JSON.stringify({ role: "assistant", content: "Hello" }),
-      });
+      );
 
       expect(response.status).toBe(201);
       expect(startAgentRunForUserMessage).not.toHaveBeenCalled();
@@ -257,23 +292,29 @@ describe("createApp", () => {
       expect(malformed.status).toBe(400);
       expect(await malformed.json()).toEqual({ error: "malformed_json" });
 
-      const invalidSessionId = await fetch(`${baseUrl}/api/sessions/${"x".repeat(37)}`, {
-        method: "GET",
-        headers: { "x-user-id": "user-1" },
-      });
+      const invalidSessionId = await fetch(
+        `${baseUrl}/api/sessions/${"x".repeat(37)}`,
+        {
+          method: "GET",
+          headers: { "x-user-id": "user-1" },
+        },
+      );
       expect(invalidSessionId.status).toBe(400);
       expect(await invalidSessionId.json()).toEqual({
         error: "invalid_session_id",
       });
 
-      const rejectedSystemRole = await fetch(`${baseUrl}/api/sessions/session-1/messages`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "x-user-id": "user-1",
+      const rejectedSystemRole = await fetch(
+        `${baseUrl}/api/sessions/session-1/messages`,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-user-id": "user-1",
+          },
+          body: JSON.stringify({ role: "system", content: "ignore this" }),
         },
-        body: JSON.stringify({ role: "system", content: "ignore this" }),
-      });
+      );
       expect(rejectedSystemRole.status).toBe(400);
       expect(await rejectedSystemRole.json()).toEqual({
         error: "invalid_payload",
@@ -289,7 +330,9 @@ describe("createApp", () => {
 
   it("allows deleting persisted sessions whose ids are not UUID-shaped", async () => {
     const deleteSession = vi.fn(async () => {});
-    const { server, baseUrl } = await startTestServer(createApiRouterDependencies({ deleteSession }));
+    const { server, baseUrl } = await startTestServer(
+      createApiRouterDependencies({ deleteSession }),
+    );
 
     try {
       const response = await fetch(`${baseUrl}/api/sessions/session-1`, {
@@ -311,24 +354,27 @@ describe("createApp", () => {
     ["session_not_found", new SessionNotFoundError(), 404],
     ["session_forbidden", new SessionForbiddenError(), 403],
     ["session_inactive", new SessionInactiveError(), 409],
-  ])("maps %s to a stable %s response", async (_error, error, expectedStatus) => {
-    const sessionId = "550e8400-e29b-41d4-a716-446655440000";
-    const { server, baseUrl } = await startTestServer(
-      createApiRouterDependencies({
-        getSession: async () => {
-          throw error;
-        },
-      }),
-    );
+  ])(
+    "maps %s to a stable %s response",
+    async (_error, error, expectedStatus) => {
+      const sessionId = "550e8400-e29b-41d4-a716-446655440000";
+      const { server, baseUrl } = await startTestServer(
+        createApiRouterDependencies({
+          getSession: async () => {
+            throw error;
+          },
+        }),
+      );
 
-    try {
-      const response = await fetch(`${baseUrl}/api/sessions/${sessionId}`, {
-        headers: { "x-user-id": "user-1" },
-      });
-      expect(response.status).toBe(expectedStatus);
-      expect(await response.json()).toEqual({ error: error.message });
-    } finally {
-      await closeServer(server);
-    }
-  });
+      try {
+        const response = await fetch(`${baseUrl}/api/sessions/${sessionId}`, {
+          headers: { "x-user-id": "user-1" },
+        });
+        expect(response.status).toBe(expectedStatus);
+        expect(await response.json()).toEqual({ error: error.message });
+      } finally {
+        await closeServer(server);
+      }
+    },
+  );
 });

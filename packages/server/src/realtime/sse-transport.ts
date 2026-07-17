@@ -3,8 +3,8 @@ import {
   RealtimeHub,
   type RealtimeScope,
   type RealtimeSubscriber,
-} from "@dentaltrip-ai/core/realtime";
-import { realtimeFrameSchema } from "@dentaltrip-ai/protocol/realtime";
+} from "@chatbot-experiments/core/realtime";
+import { realtimeFrameSchema } from "@chatbot-experiments/protocol/realtime";
 import type { RequestHandler, Response } from "express";
 
 const KEEPALIVE_INTERVAL_MS = 15000;
@@ -13,7 +13,10 @@ const MAX_BUFFERED_SSE_BYTES = 256 * 1024;
 /**
  * Validates that a user owns a session before allowing a session-scoped stream.
  */
-export type SessionOwnershipValidator = (sessionId: string, userId: string) => Promise<boolean>;
+export type SessionOwnershipValidator = (
+  sessionId: string,
+  userId: string,
+) => Promise<boolean>;
 
 /** Dependencies for constructing an authenticated realtime SSE transport. */
 export interface RealtimeStreamOptions {
@@ -40,7 +43,9 @@ export interface RealtimeStreamTransport {
 /**
  * Creates the SSE transport used for authenticated realtime chat updates.
  */
-export function createRealtimeStreamTransport(options: RealtimeStreamOptions = {}): RealtimeStreamTransport {
+export function createRealtimeStreamTransport(
+  options: RealtimeStreamOptions = {},
+): RealtimeStreamTransport {
   const { hub = new RealtimeHub(), validateSessionOwnership } = options;
   const activeSubscribers = new Set<SseSubscriber>();
 
@@ -53,7 +58,9 @@ export function createRealtimeStreamTransport(options: RealtimeStreamOptions = {
     }
 
     const sessionId =
-      typeof req.query.session_id === "string" && req.query.session_id.trim() ? req.query.session_id.trim() : null;
+      typeof req.query.session_id === "string" && req.query.session_id.trim()
+        ? req.query.session_id.trim()
+        : null;
 
     if (sessionId && !validateSessionOwnership) {
       res.status(401).json({ error: "unauthorized" });
@@ -75,7 +82,9 @@ export function createRealtimeStreamTransport(options: RealtimeStreamOptions = {
       }
     }
 
-    const scope: RealtimeScope = sessionId ? { type: "session", id: sessionId } : { type: "user", id: userId };
+    const scope: RealtimeScope = sessionId
+      ? { type: "session", id: sessionId }
+      : { type: "user", id: userId };
 
     res.status(200);
     res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
@@ -120,7 +129,9 @@ export function createRealtimeStreamTransport(options: RealtimeStreamOptions = {
 /**
  * Creates an authenticated SSE stream handler for realtime chat updates.
  */
-export function createRealtimeStreamHandler(options: RealtimeStreamOptions = {}): RequestHandler {
+export function createRealtimeStreamHandler(
+  options: RealtimeStreamOptions = {},
+): RequestHandler {
   return createRealtimeStreamTransport(options).handler;
 }
 
@@ -233,7 +244,10 @@ function formatSseFrame(frame: RealtimeFrame): string | null {
   const parsedFrame = realtimeFrameSchema.safeParse(frame);
 
   if (!parsedFrame.success) {
-    console.error("[Realtime] Refusing to serialize invalid SSE frame:", parsedFrame.error.flatten());
+    console.error(
+      "[Realtime] Refusing to serialize invalid SSE frame:",
+      parsedFrame.error.flatten(),
+    );
     return null;
   }
 

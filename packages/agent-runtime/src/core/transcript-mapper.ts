@@ -1,7 +1,9 @@
-import type { Message as AgentMessage } from "@dentaltrip-ai/ai";
+import type { Message as AgentMessage } from "@chatbot-experiments/ai";
 
 /** Wraps a full agent message as the persisted rich-log payload for a session_data entry. */
-export function toSessionDataMessagePayload(message: AgentMessage): { message: AgentMessage } {
+export function toSessionDataMessagePayload(message: AgentMessage): {
+  message: AgentMessage;
+} {
   return { message };
 }
 
@@ -11,13 +13,19 @@ export function extractAgentMessageText(message: AgentMessage): string {
     case "system":
       return message.content;
     case "user":
-      return typeof message.content === "string" ? message.content : extractTextParts(message.content);
+      return typeof message.content === "string"
+        ? message.content
+        : extractTextParts(message.content);
     case "assistant":
     case "toolResult":
       return extractTextParts(message.content);
   }
 }
 
-function extractTextParts(parts: readonly { type: string; text?: string }[]): string {
-  return parts.map((part) => (part.type === "text" ? (part.text ?? "") : "")).join("");
+function extractTextParts(
+  parts: readonly { type: string; text?: string }[],
+): string {
+  return parts
+    .map((part) => (part.type === "text" ? (part.text ?? "") : ""))
+    .join("");
 }

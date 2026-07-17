@@ -1,11 +1,11 @@
 "use client";
 
-import { useDeleteSessions } from "@dentaltrip-ai/client/chat";
+import { useDeleteSessions } from "@chatbot-experiments/client/chat";
 import {
   getChatRootPath,
   useNavigation,
-} from "@dentaltrip-ai/client/navigation";
-import { Loader } from "@dentaltrip-ai/ui";
+} from "@chatbot-experiments/client/navigation";
+import { Loader } from "@chatbot-experiments/ui";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,7 +15,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@dentaltrip-ai/ui/components/ui/alert-dialog";
+} from "@chatbot-experiments/ui/components/ui/alert-dialog";
 
 interface DeleteAllSessionsDialogProps {
   open: boolean;

@@ -1,5 +1,5 @@
-import type { AgentRunStore } from "@dentaltrip-ai/core/agent";
-import type { SessionRepository } from "@dentaltrip-ai/core/session";
+import type { AgentRunStore } from "@chatbot-experiments/core/agent";
+import type { SessionRepository } from "@chatbot-experiments/core/session";
 import type { DatabaseClient } from "../client.ts";
 import { DrizzleAgentRunRepository } from "./agent-run-repository.ts";
 import { DrizzleSessionRepository } from "./session-repository.ts";
@@ -13,7 +13,9 @@ export interface DatabaseRepositories {
 }
 
 /** Creates all repository adapters backed by a database client. */
-export function createDatabaseRepositories(client: DatabaseClient): DatabaseRepositories {
+export function createDatabaseRepositories(
+  client: DatabaseClient,
+): DatabaseRepositories {
   return {
     sessionRepository: new DrizzleSessionRepository(client.db),
     agentRunStore: new DrizzleAgentRunRepository(client.db),

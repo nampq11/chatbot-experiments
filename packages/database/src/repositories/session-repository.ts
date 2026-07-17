@@ -8,7 +8,7 @@ import type {
   Session,
   SessionDataEntry,
   SessionRepository,
-} from "@dentaltrip-ai/core/session";
+} from "@chatbot-experiments/core/session";
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, eq, inArray, lt, or, sql } from "drizzle-orm";
 import type { DatabaseClient } from "../client.ts";
@@ -83,7 +83,11 @@ export class DrizzleSessionRepository implements SessionRepository {
   }
 
   async getSession(sessionId: string): Promise<Session | null> {
-    const rows = await this.db.select().from(sessions).where(eq(sessions.id, sessionId)).limit(1);
+    const rows = await this.db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.id, sessionId))
+      .limit(1);
     const row = rows[0];
 
     if (row === undefined) {
@@ -93,7 +97,9 @@ export class DrizzleSessionRepository implements SessionRepository {
     return this.mapSession(row);
   }
 
-  async listSessions(input: ListSessionsRepositoryInput): Promise<PaginatedResult<Session>> {
+  async listSessions(
+    input: ListSessionsRepositoryInput,
+  ): Promise<PaginatedResult<Session>> {
     const pageSize = input.limit ?? 20;
     const conditions: SQL[] = [eq(sessions.userId, input.userId)];
 
@@ -101,7 +107,10 @@ export class DrizzleSessionRepository implements SessionRepository {
       const parsedCursor = this.decodeCursor(input.cursor);
       const cursorCondition = or(
         lt(sessions.updatedAt, parsedCursor.updatedAt),
-        and(eq(sessions.updatedAt, parsedCursor.updatedAt), lt(sessions.id, parsedCursor.id)),
+        and(
+          eq(sessions.updatedAt, parsedCursor.updatedAt),
+          lt(sessions.id, parsedCursor.id),
+        ),
       );
 
       if (!cursorCondition) {
@@ -126,7 +135,10 @@ export class DrizzleSessionRepository implements SessionRepository {
     const hasMore = rows.length > pageSize;
     const items = hasMore ? rows.slice(0, pageSize) : rows;
     const lastItem = items.at(-1);
-    const nextCursor = hasMore && lastItem ? this.encodeCursor(lastItem.updatedAt, lastItem.id) : null;
+    const nextCursor =
+      hasMore && lastItem
+        ? this.encodeCursor(lastItem.updatedAt, lastItem.id)
+        : null;
 
     return { items: items.map((r) => this.mapSession(r)), nextCursor };
   }
@@ -172,12 +184,22 @@ export class DrizzleSessionRepository implements SessionRepository {
     });
   }
 
-  async appendSessionData(input: AppendSessionDataRepositoryInput): Promise<SessionDataEntry> {
-    return this.db.transaction(async (tx: Transaction) => this.appendSessionDataWithTransaction(tx, input));
+  async appendSessionData(
+    input: AppendSessionDataRepositoryInput,
+  ): Promise<SessionDataEntry> {
+    return this.db.transaction(async (tx: Transaction) =>
+      this.appendSessionDataWithTransaction(tx, input),
+    );
   }
 
-  async updateSessionStatus(sessionId: string, status: Session["status"]): Promise<void> {
-    await this.db.update(sessions).set({ status }).where(eq(sessions.id, sessionId));
+  async updateSessionStatus(
+    sessionId: string,
+    status: Session["status"],
+  ): Promise<void> {
+    await this.db
+      .update(sessions)
+      .set({ status })
+      .where(eq(sessions.id, sessionId));
   }
 
   async listMessages(sessionId: string): Promise<Message[]> {
@@ -211,15 +233,22 @@ export class DrizzleSessionRepository implements SessionRepository {
 
   async deleteSessionsByUser(userId: string): Promise<string[]> {
     return this.db.transaction(async (tx: Transaction) => {
-      const sessionRows = await tx.select({ id: sessions.id }).from(sessions).where(eq(sessions.userId, userId));
+      const sessionRows = await tx
+        .select({ id: sessions.id })
+        .from(sessions)
+        .where(eq(sessions.userId, userId));
       const sessionIds = sessionRows.map((session) => session.id);
 
       if (sessionIds.length === 0) {
         return [];
       }
 
-      await tx.delete(agentRuns).where(inArray(agentRuns.sessionId, sessionIds));
-      await tx.delete(sessionData).where(inArray(sessionData.sessionId, sessionIds));
+      await tx
+        .delete(agentRuns)
+        .where(inArray(agentRuns.sessionId, sessionIds));
+      await tx
+        .delete(sessionData)
+        .where(inArray(sessionData.sessionId, sessionIds));
       await tx.delete(messages).where(inArray(messages.sessionId, sessionIds));
       await tx.delete(sessions).where(inArray(sessions.id, sessionIds));
 

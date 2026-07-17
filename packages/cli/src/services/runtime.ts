@@ -1,10 +1,14 @@
 import { randomUUID } from "node:crypto";
 import { stdin as input, stdout as output } from "node:process";
-import { createAgentRuntime } from "@dentaltrip-ai/agent-runtime";
-import { AgentService } from "@dentaltrip-ai/core/agent";
-import { createInMemoryEventBus } from "@dentaltrip-ai/core/events";
-import { SessionUseCases } from "@dentaltrip-ai/core/session";
-import { createDatabaseClient, createDatabaseRepositories, runMigrations } from "@dentaltrip-ai/database";
+import { createAgentRuntime } from "@chatbot-experiments/agent-runtime";
+import { AgentService } from "@chatbot-experiments/core/agent";
+import { createInMemoryEventBus } from "@chatbot-experiments/core/events";
+import { SessionUseCases } from "@chatbot-experiments/core/session";
+import {
+  createDatabaseClient,
+  createDatabaseRepositories,
+  runMigrations,
+} from "@chatbot-experiments/database";
 import type { CliEnv } from "../env.ts";
 
 /** Runtime services required to run the interactive CLI loop. */
@@ -36,7 +40,8 @@ export async function createCliRuntime(
 
   await runMigrations(env.databaseUrl);
   const database = await createDatabaseClient(env.databaseUrl);
-  const { sessionRepository, agentRunStore } = createDatabaseRepositories(database);
+  const { sessionRepository, agentRunStore } =
+    createDatabaseRepositories(database);
   const events = createInMemoryEventBus({
     onFailure: ({ event, error }) => {
       output.write(`${event.type} listener failed: ${error.message}\n`);

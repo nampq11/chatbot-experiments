@@ -1,4 +1,7 @@
-import type { AssistantMessageEvent, Model } from "@dentaltrip-ai/llm-core";
+import type {
+  AssistantMessageEvent,
+  Model,
+} from "@chatbot-experiments/llm-core";
 import type { ResponseStreamEvent } from "openai/resources/responses/responses";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -34,13 +37,17 @@ const MODEL: Model<"azure-openai-responses"> = {
   maxTokens: 100,
 };
 
-async function* createResponseStream(events: ResponseStreamEvent[]): AsyncIterable<ResponseStreamEvent> {
+async function* createResponseStream(
+  events: ResponseStreamEvent[],
+): AsyncIterable<ResponseStreamEvent> {
   for (const event of events) {
     yield event;
   }
 }
 
-async function collectEvents(events: ResponseStreamEvent[]): Promise<AssistantMessageEvent[]> {
+async function collectEvents(
+  events: ResponseStreamEvent[],
+): Promise<AssistantMessageEvent[]> {
   streamMock.mockResolvedValueOnce(createResponseStream(events));
   const stream = streamAzureOpenAIResponses(
     MODEL,
@@ -107,7 +114,8 @@ describe("Azure OpenAI Responses conversion", () => {
       reason: "error",
       error: {
         stopReason: "error",
-        errorMessage: "Azure OpenAI Responses stream ended without a terminal response event.",
+        errorMessage:
+          "Azure OpenAI Responses stream ended without a terminal response event.",
       },
     });
   });
@@ -141,7 +149,9 @@ describe("Azure OpenAI Responses conversion", () => {
       reason: "error",
       error: {
         stopReason: "error",
-        errorMessage: expect.stringContaining("Invalid final tool arguments for search"),
+        errorMessage: expect.stringContaining(
+          "Invalid final tool arguments for search",
+        ),
       },
     });
   });

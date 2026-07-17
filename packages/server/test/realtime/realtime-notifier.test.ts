@@ -1,7 +1,18 @@
-import { createInMemoryEventBus, type DomainEvent, type EventBus } from "@dentaltrip-ai/core/events";
-import type { RealtimeFrame, RealtimeSubscriber } from "@dentaltrip-ai/core/realtime";
+import {
+  createInMemoryEventBus,
+  type DomainEvent,
+  type EventBus,
+} from "@chatbot-experiments/core/events";
+import type {
+  RealtimeFrame,
+  RealtimeSubscriber,
+} from "@chatbot-experiments/core/realtime";
 import { describe, expect, it, vi } from "vitest";
-import { mapEventToFrame, RealtimeNotifier, resolveScopes } from "../../src/realtime/realtime-notifier.ts";
+import {
+  mapEventToFrame,
+  RealtimeNotifier,
+  resolveScopes,
+} from "../../src/realtime/realtime-notifier.ts";
 
 type TestSubscriber = RealtimeSubscriber & {
   readonly send: ReturnType<typeof vi.fn>;
@@ -72,7 +83,8 @@ describe("RealtimeNotifier", () => {
   });
 
   it("subscribes to domain events and fans out projected frames", () => {
-    const { events, notifier, userSubscriber, sessionSubscriber } = setupNotifier();
+    const { events, notifier, userSubscriber, sessionSubscriber } =
+      setupNotifier();
 
     notifier.start();
 

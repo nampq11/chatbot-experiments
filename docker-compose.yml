@@ -1,4 +1,4 @@
-name: dentaltrip-ai
+name: chatbot-experiments
 
 services:
   mysql:
@@ -7,7 +7,7 @@ services:
       - "${DB_HOST:-127.0.0.1}:${DB_PORT:-3306}:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-password}
-      MYSQL_DATABASE: ${DB_NAME:-dentaltrip}
+      MYSQL_DATABASE: ${DB_NAME:-chatbot_experiments}
     restart: unless-stopped
     healthcheck:
       test:

@@ -1,10 +1,10 @@
 {
-  "name": "@dentaltrip-ai/server",
+  "name": "@chatbot-experiments/server",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "build:deps": "pnpm --filter @dentaltrip-ai/protocol build && pnpm --filter @dentaltrip-ai/core build && pnpm --filter @dentaltrip-ai/database build && pnpm --filter @dentaltrip-ai/agent-runtime build",
+    "build:deps": "pnpm --filter @chatbot-experiments/protocol build && pnpm --filter @chatbot-experiments/core build && pnpm --filter @chatbot-experiments/database build && pnpm --filter @chatbot-experiments/agent-runtime build",
     "dev": "pnpm run build:deps && tsx watch --env-file=.env src/main.ts",
     "build": "pnpm run build:deps && tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
     "lint": "pnpm exec biome check --error-on-warnings .",
@@ -12,10 +12,10 @@
     "test": "pnpm run build:deps && vitest run"
   },
   "dependencies": {
-    "@dentaltrip-ai/agent-runtime": "workspace:*",
-    "@dentaltrip-ai/core": "workspace:*",
-    "@dentaltrip-ai/database": "workspace:*",
-    "@dentaltrip-ai/protocol": "workspace:*",
+    "@chatbot-experiments/agent-runtime": "workspace:*",
+    "@chatbot-experiments/core": "workspace:*",
+    "@chatbot-experiments/database": "workspace:*",
+    "@chatbot-experiments/protocol": "workspace:*",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "zod": "^4.4.3"

@@ -8,7 +8,7 @@ import type {
   TextContent,
   Transport,
   Usage,
-} from "@dentaltrip-ai/llm-core";
+} from "@chatbot-experiments/llm-core";
 import { runAgentLoop, runAgentLoopContinue } from "./agent-loop.js";
 import type {
   AfterToolCallContext,
@@ -51,10 +51,16 @@ const DEFAULT_MODEL = {
 } satisfies Model<Api>;
 
 type AgentInitialState = Partial<
-  Omit<AgentState, "isStreaming" | "streamingMessage" | "pendingToolCalls" | "errorMessage">
+  Omit<
+    AgentState,
+    "isStreaming" | "streamingMessage" | "pendingToolCalls" | "errorMessage"
+  >
 >;
 
-type MutableAgentState = Omit<AgentState, "isStreaming" | "streamingMessage" | "pendingToolCalls" | "errorMessage"> & {
+type MutableAgentState = Omit<
+  AgentState,
+  "isStreaming" | "streamingMessage" | "pendingToolCalls" | "errorMessage"
+> & {
   isStreaming: boolean;
   streamingMessage?: AssistantMessage;
   pendingToolCalls: Set<string>;
@@ -63,11 +69,16 @@ type MutableAgentState = Omit<AgentState, "isStreaming" | "streamingMessage" | "
 
 function defaultConvertToLlm(messages: AgentMessage[]): Message[] {
   return messages.filter(
-    (message) => message.role === "user" || message.role === "assistant" || message.role === "toolResult",
+    (message) =>
+      message.role === "user" ||
+      message.role === "assistant" ||
+      message.role === "toolResult",
   );
 }
 
-function createMutableAgentState(initialState?: AgentInitialState): MutableAgentState {
+function createMutableAgentState(
+  initialState?: AgentInitialState,
+): MutableAgentState {
   let tools = initialState?.tools?.slice() ?? [];
   let messages = initialState?.messages?.slice() ?? [];
 
@@ -140,16 +151,30 @@ type ActiveRun = {
 export interface AgentOptions {
   initialState?: AgentInitialState;
   convertToLlm?: (messages: AgentMessage[]) => Message[] | Promise<Message[]>;
-  transformContext?: (messages: AgentMessage[], signal?: AbortSignal) => Promise<AgentMessage[]>;
+  transformContext?: (
+    messages: AgentMessage[],
+    signal?: AbortSignal,
+  ) => Promise<AgentMessage[]>;
   streamFn: StreamFn;
-  getApiKey?: (provider: string) => Promise<string | undefined> | string | undefined;
+  getApiKey?: (
+    provider: string,
+  ) => Promise<string | undefined> | string | undefined;
   onPayload?: SimpleStreamOptions["onPayload"];
   onResponse?: SimpleStreamOptions["onResponse"];
-  beforeToolCall?: (context: BeforeToolCallContext, signal?: AbortSignal) => Promise<BeforeToolCallResult | undefined>;
-  afterToolCall?: (context: AfterToolCallContext, signal?: AbortSignal) => Promise<AfterToolCallResult | undefined>;
+  beforeToolCall?: (
+    context: BeforeToolCallContext,
+    signal?: AbortSignal,
+  ) => Promise<BeforeToolCallResult | undefined>;
+  afterToolCall?: (
+    context: AfterToolCallContext,
+    signal?: AbortSignal,
+  ) => Promise<AfterToolCallResult | undefined>;
   prepareNextTurn?: (
     signal?: AbortSignal,
-  ) => Promise<AgentLoopTurnUpdate | undefined> | AgentLoopTurnUpdate | undefined;
+  ) =>
+    | Promise<AgentLoopTurnUpdate | undefined>
+    | AgentLoopTurnUpdate
+    | undefined;
   steeringMode?: QueueMode;
   followUpMode?: QueueMode;
   sessionId?: string;
@@ -160,16 +185,25 @@ export interface AgentOptions {
 
 /** Stateful provider-independent agent runtime. */
 export class Agent {
-  private readonly listeners = new Set<(event: AgentEvent, signal: AbortSignal) => Promise<void> | void>();
+  private readonly listeners = new Set<
+    (event: AgentEvent, signal: AbortSignal) => Promise<void> | void
+  >();
   private readonly steeringQueue: PendingMessageQueue;
   private readonly followUpQueue: PendingMessageQueue;
   private readonly _state: MutableAgentState;
   private activeRun?: ActiveRun;
 
-  public readonly convertToLlm: (messages: AgentMessage[]) => Message[] | Promise<Message[]>;
-  public readonly transformContext?: (messages: AgentMessage[], signal?: AbortSignal) => Promise<AgentMessage[]>;
+  public readonly convertToLlm: (
+    messages: AgentMessage[],
+  ) => Message[] | Promise<Message[]>;
+  public readonly transformContext?: (
+    messages: AgentMessage[],
+    signal?: AbortSignal,
+  ) => Promise<AgentMessage[]>;
   public readonly streamFn: StreamFn;
-  public readonly getApiKey?: (provider: string) => Promise<string | undefined> | string | undefined;
+  public readonly getApiKey?: (
+    provider: string,
+  ) => Promise<string | undefined> | string | undefined;
   public readonly onPayload?: SimpleStreamOptions["onPayload"];
   public readonly onResponse?: SimpleStreamOptions["onResponse"];
   public readonly beforeToolCall?: (
@@ -182,7 +216,10 @@ export class Agent {
   ) => Promise<AfterToolCallResult | undefined>;
   public readonly prepareNextTurn?: (
     signal?: AbortSignal,
-  ) => Promise<AgentLoopTurnUpdate | undefined> | AgentLoopTurnUpdate | undefined;
+  ) =>
+    | Promise<AgentLoopTurnUpdate | undefined>
+    | AgentLoopTurnUpdate
+    | undefined;
   public readonly sessionId?: string;
   public readonly transport: Transport;
   public readonly maxRetryDelayMs?: number;
@@ -199,8 +236,12 @@ export class Agent {
     this.beforeToolCall = options.beforeToolCall;
     this.afterToolCall = options.afterToolCall;
     this.prepareNextTurn = options.prepareNextTurn;
-    this.steeringQueue = new PendingMessageQueue(options.steeringMode ?? "one-at-a-time");
-    this.followUpQueue = new PendingMessageQueue(options.followUpMode ?? "one-at-a-time");
+    this.steeringQueue = new PendingMessageQueue(
+      options.steeringMode ?? "one-at-a-time",
+    );
+    this.followUpQueue = new PendingMessageQueue(
+      options.followUpMode ?? "one-at-a-time",
+    );
     this.sessionId = options.sessionId;
     this.transport = options.transport ?? "auto";
     this.maxRetryDelayMs = options.maxRetryDelayMs;
@@ -213,7 +254,9 @@ export class Agent {
   }
 
   /** Subscribes to all agent lifecycle events. */
-  subscribe(listener: (event: AgentEvent, signal: AbortSignal) => Promise<void> | void): () => void {
+  subscribe(
+    listener: (event: AgentEvent, signal: AbortSignal) => Promise<void> | void,
+  ): () => void {
     this.listeners.add(listener);
     return () => {
       this.listeners.delete(listener);
@@ -264,7 +307,9 @@ export class Agent {
   /** Starts a new prompt from text, a single message, or a batch of messages. */
   async prompt(input: PromptInput, images?: ImageContent[]): Promise<void> {
     if (this.activeRun) {
-      throw new Error("Agent is already processing a prompt. Wait for completion before prompting.");
+      throw new Error(
+        "Agent is already processing a prompt. Wait for completion before prompting.",
+      );
     }
 
     const messages = this.normalizePromptInput(input, images);
@@ -283,7 +328,9 @@ export class Agent {
   /** Continues from the current transcript. The last message must not be an assistant message. */
   async continue(): Promise<void> {
     if (this.activeRun) {
-      throw new Error("Agent is already processing. Wait for completion before continuing.");
+      throw new Error(
+        "Agent is already processing. Wait for completion before continuing.",
+      );
     }
 
     const lastMessage = this._state.messages[this._state.messages.length - 1];
@@ -324,7 +371,10 @@ export class Agent {
     await this.waitForIdle();
   }
 
-  private normalizePromptInput(input: PromptInput, images?: ImageContent[]): AgentMessage[] {
+  private normalizePromptInput(
+    input: PromptInput,
+    images?: ImageContent[],
+  ): AgentMessage[] {
     if (Array.isArray(input)) {
       return input;
     }
@@ -333,7 +383,9 @@ export class Agent {
       return [input];
     }
 
-    const content: Array<TextContent | ImageContent> = [{ type: "text", text: input }];
+    const content: Array<TextContent | ImageContent> = [
+      { type: "text", text: input },
+    ];
     if (images && images.length > 0) {
       content.push(...images);
     }
@@ -372,7 +424,9 @@ export class Agent {
       toolExecution: this.toolExecution,
       beforeToolCall: this.beforeToolCall,
       afterToolCall: this.afterToolCall,
-      prepareNextTurn: this.prepareNextTurn ? async (signal) => this.prepareNextTurn?.(signal) : undefined,
+      prepareNextTurn: this.prepareNextTurn
+        ? async (signal) => this.prepareNextTurn?.(signal)
+        : undefined,
       convertToLlm: this.convertToLlm,
       transformContext: this.transformContext,
       getApiKey: this.getApiKey,
@@ -381,7 +435,9 @@ export class Agent {
     };
   }
 
-  private async runWithLifecycle(executor: (signal: AbortSignal) => Promise<void>): Promise<void> {
+  private async runWithLifecycle(
+    executor: (signal: AbortSignal) => Promise<void>,
+  ): Promise<void> {
     if (this.activeRun) {
       throw new Error("Agent is already processing.");
     }
@@ -405,7 +461,10 @@ export class Agent {
     }
   }
 
-  private async handleRunFailure(error: unknown, aborted: boolean): Promise<void> {
+  private async handleRunFailure(
+    error: unknown,
+    aborted: boolean,
+  ): Promise<void> {
     const errorText = error instanceof Error ? error.message : String(error);
     const stopReason = aborted ? "aborted" : "error";
     const status = aborted ? "cancelled" : "failed";
@@ -513,6 +572,8 @@ export class Agent {
       throw new Error("Agent listener invoked outside active run");
     }
 
-    await Promise.all(Array.from(this.listeners, (listener) => listener(event, signal)));
+    await Promise.all(
+      Array.from(this.listeners, (listener) => listener(event, signal)),
+    );
   }
 }

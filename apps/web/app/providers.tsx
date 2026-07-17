@@ -1,9 +1,9 @@
 "use client";
 
-import { ApiClient } from "@dentaltrip-ai/client/api";
-import { setChatApiClient } from "@dentaltrip-ai/client/chat";
-import { useIdentityStore } from "@dentaltrip-ai/client/identity";
-import { ImageRendererProvider } from "@dentaltrip-ai/views";
+import { ApiClient } from "@chatbot-experiments/client/api";
+import { setChatApiClient } from "@chatbot-experiments/client/chat";
+import { useIdentityStore } from "@chatbot-experiments/client/identity";
+import { ImageRendererProvider } from "@chatbot-experiments/views";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -11,7 +11,7 @@ import { NextImageRenderer } from "./image-renderer";
 import { WebNavigationProvider } from "./navigation-adapter";
 import { AI_API_BASE_URL } from "./runtime-config";
 
-const STORAGE_KEY = "dentaltrip:guest-user-id";
+const STORAGE_KEY = "chatbot-experiments:guest-user-id";
 
 /** Generate or retrieve a stable per-browser guest user ID. */
 function resolveGuestUserId(): string {
@@ -50,7 +50,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <WebNavigationProvider>
-        <ImageRendererProvider renderer={NextImageRenderer}>{children}</ImageRendererProvider>
+        <ImageRendererProvider renderer={NextImageRenderer}>
+          {children}
+        </ImageRendererProvider>
       </WebNavigationProvider>
     </QueryClientProvider>
   );

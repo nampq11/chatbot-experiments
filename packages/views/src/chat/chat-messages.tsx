@@ -4,18 +4,18 @@ import {
   type Message as ChatMessage,
   useChatStore,
   useMessages,
-} from "@dentaltrip-ai/client/chat";
+} from "@chatbot-experiments/client/chat";
 import {
   ChatContainerAutoScroll,
   ChatContainerContent,
   ChatContainerRoot,
   cn,
-} from "@dentaltrip-ai/ui";
+} from "@chatbot-experiments/ui";
 import {
   Message,
   MessageContent,
-} from "@dentaltrip-ai/ui/components/ui/message";
-import { ScrollButton } from "@dentaltrip-ai/ui/components/ui/scroll-button";
+} from "@chatbot-experiments/ui/components/ui/message";
+import { ScrollButton } from "@chatbot-experiments/ui/components/ui/scroll-button";
 import { useCallback, useEffect, useState } from "react";
 import { AssistantMarkdownContent } from "./assistant-markdown-content";
 import {

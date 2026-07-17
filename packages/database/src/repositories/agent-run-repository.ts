@@ -3,7 +3,7 @@ import type {
   AgentRunStore,
   CreateAgentRunInput,
   UpdateAgentRunInput,
-} from "@dentaltrip-ai/core/agent";
+} from "@chatbot-experiments/core/agent";
 import { eq } from "drizzle-orm";
 import type { DatabaseClient } from "../client.ts";
 import { agentRuns } from "../schema/index.ts";
@@ -35,7 +35,10 @@ export class DrizzleAgentRunRepository implements AgentRunStore {
     return record;
   }
 
-  async updateAgentRun(runId: string, input: UpdateAgentRunInput): Promise<void> {
+  async updateAgentRun(
+    runId: string,
+    input: UpdateAgentRunInput,
+  ): Promise<void> {
     const now = new Date();
     const set: Partial<AgentRunRecord> = {
       status: input.status,

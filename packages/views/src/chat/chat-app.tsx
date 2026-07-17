@@ -1,6 +1,6 @@
 "use client";
 
-import { SidebarProvider } from "@dentaltrip-ai/ui/components/ui/sidebar";
+import { SidebarProvider } from "@chatbot-experiments/ui/components/ui/sidebar";
 import { ChatContent } from "./chat-content";
 import { ChatSidebar } from "./chat-sidebar";
 import { DeleteSessionDialog } from "./delete-session-dialog";

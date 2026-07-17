@@ -1,5 +1,5 @@
 {
-  "extends": "@dentaltrip-ai/typescript-config/base.json",
+  "extends": "@chatbot-experiments/typescript-config/base.json",
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "dist",

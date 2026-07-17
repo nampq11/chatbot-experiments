@@ -42,7 +42,7 @@ export type {
   TSchema,
   Usage,
   UserMessage,
-} from "@dentaltrip-ai/llm-core";
+} from "@chatbot-experiments/llm-core";
 export {
   AssistantMessageEventStream,
   createAssistantMessageEventStream,
@@ -51,7 +51,7 @@ export {
   isTextContent,
   isToolCall,
   Type,
-} from "@dentaltrip-ai/llm-core";
+} from "@chatbot-experiments/llm-core";
 export type {
   ApiProvider,
   ApiStreamFunction,

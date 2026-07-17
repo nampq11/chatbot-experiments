@@ -1,7 +1,7 @@
 "use client";
 
-import { useSyncSessionId } from "@dentaltrip-ai/client/chat";
-import { ChatApp } from "@dentaltrip-ai/views/chat";
+import { useSyncSessionId } from "@chatbot-experiments/client/chat";
+import { ChatApp } from "@chatbot-experiments/views/chat";
 
 export default function Home() {
   useSyncSessionId(null);

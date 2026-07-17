@@ -1,5 +1,5 @@
 {
-  "name": "@dentaltrip-ai/llm-core",
+  "name": "@chatbot-experiments/llm-core",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -46,7 +46,7 @@
     "@sinclair/typebox": "0.34.49"
   },
   "devDependencies": {
-    "@dentaltrip-ai/typescript-config": "workspace:*",
+    "@chatbot-experiments/typescript-config": "workspace:*",
     "typescript": "5.9.2",
     "vitest": "^3.2.4"
   }

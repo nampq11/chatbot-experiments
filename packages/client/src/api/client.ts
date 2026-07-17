@@ -1,6 +1,20 @@
-import { type RealtimeFrame, realtimeFrameSchema } from "@dentaltrip-ai/protocol/realtime";
-import type { Message, MessageRole, PaginatedSessionsResponse, Session } from "@dentaltrip-ai/protocol/session";
-import { messageArraySchema, messageSchema, paginatedSessionsSchema, parseWithFallback, sessionSchema } from "./schema";
+import {
+  type RealtimeFrame,
+  realtimeFrameSchema,
+} from "@chatbot-experiments/protocol/realtime";
+import type {
+  Message,
+  MessageRole,
+  PaginatedSessionsResponse,
+  Session,
+} from "@chatbot-experiments/protocol/session";
+import {
+  messageArraySchema,
+  messageSchema,
+  paginatedSessionsSchema,
+  parseWithFallback,
+  sessionSchema,
+} from "./schema";
 
 type RequestFn = (url: string, options?: RequestInit) => Promise<Response>;
 type RealtimeFrameHandler = (frame: RealtimeFrame) => void;
@@ -88,7 +102,10 @@ function parseEventChunk(chunk: string): RealtimeFrame | null {
   return parseRealtimeFrame(dataLines.join("\n"), eventName);
 }
 
-function parseRealtimeFrame(payload: string, eventName: string | null): RealtimeFrame | null {
+function parseRealtimeFrame(
+  payload: string,
+  eventName: string | null,
+): RealtimeFrame | null {
   let parsedPayload: unknown;
 
   try {
@@ -101,7 +118,10 @@ function parseRealtimeFrame(payload: string, eventName: string | null): Realtime
   const parsedFrame = realtimeFrameSchema.safeParse(parsedPayload);
 
   if (!parsedFrame.success) {
-    console.warn("[Realtime] Ignoring invalid SSE frame:", parsedFrame.error.flatten());
+    console.warn(
+      "[Realtime] Ignoring invalid SSE frame:",
+      parsedFrame.error.flatten(),
+    );
     return null;
   }
 
@@ -132,7 +152,9 @@ async function consumeEventStream(
         break;
       }
 
-      buffer = normalizeSseLineEndings(buffer + decoder.decode(value, { stream: true }));
+      buffer = normalizeSseLineEndings(
+        buffer + decoder.decode(value, { stream: true }),
+      );
 
       const { completeChunks, tail } = splitCompleteEventChunks(buffer);
       buffer = tail;
@@ -180,7 +202,12 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object";
 }
 
-function readStringField(value: unknown, camelKey: string, snakeKey: string, fallback: string): string {
+function readStringField(
+  value: unknown,
+  camelKey: string,
+  snakeKey: string,
+  fallback: string,
+): string {
   if (!isRecord(value)) {
     return fallback;
   }
@@ -196,7 +223,10 @@ function readStringField(value: unknown, camelKey: string, snakeKey: string, fal
 }
 
 /** Builds a safe placeholder session when a response fails schema validation. */
-function createSessionFallback(raw: unknown, defaults: Partial<Pick<Session, "id" | "title">> = {}): Session {
+function createSessionFallback(
+  raw: unknown,
+  defaults: Partial<Pick<Session, "id" | "title">> = {},
+): Session {
   const timestamp = new Date(0);
 
   return {
@@ -211,10 +241,18 @@ function createSessionFallback(raw: unknown, defaults: Partial<Pick<Session, "id
 }
 
 /** Builds a safe placeholder message when a response fails schema validation. */
-function createMessageFallback(raw: unknown, defaults: Pick<Message, "content" | "role" | "sessionId">): Message {
+function createMessageFallback(
+  raw: unknown,
+  defaults: Pick<Message, "content" | "role" | "sessionId">,
+): Message {
   return {
     id: readStringField(raw, "id", "id", ""),
-    sessionId: readStringField(raw, "sessionId", "session_id", defaults.sessionId),
+    sessionId: readStringField(
+      raw,
+      "sessionId",
+      "session_id",
+      defaults.sessionId,
+    ),
     userId: readStringField(raw, "userId", "user_id", ""),
     sequence: 0,
     role: defaults.role,
@@ -234,7 +272,10 @@ export class ApiClient {
     this.request = requestFn ?? defaultRequest;
   }
 
-  private async fetchJson(path: string, options?: RequestInit): Promise<unknown> {
+  private async fetchJson(
+    path: string,
+    options?: RequestInit,
+  ): Promise<unknown> {
     const url = `${this.baseUrl}${path}`;
     const headers = { ...this.getHeaders(), ...options?.headers };
     const response = await this.request(url, { ...options, headers });
@@ -243,7 +284,10 @@ export class ApiClient {
     return response.json();
   }
 
-  async listSessions(params?: { cursor?: string; limit?: number }): Promise<PaginatedSessionsResponse> {
+  async listSessions(params?: {
+    cursor?: string;
+    limit?: number;
+  }): Promise<PaginatedSessionsResponse> {
     const qs = new URLSearchParams();
 
     if (params?.cursor) {
@@ -257,7 +301,12 @@ export class ApiClient {
     const queryString = qs.toString();
     const url = queryString ? `/api/sessions?${queryString}` : "/api/sessions";
     const raw = await this.fetchJson(url);
-    return parseWithFallback(paginatedSessionsSchema, raw, { items: [], nextCursor: null }, "sessions list response");
+    return parseWithFallback(
+      paginatedSessionsSchema,
+      raw,
+      { items: [], nextCursor: null },
+      "sessions list response",
+    );
   }
 
   async createSession(title: string): Promise<Session> {
@@ -266,7 +315,12 @@ export class ApiClient {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title }),
     });
-    return parseWithFallback(sessionSchema, raw, createSessionFallback(raw, { title }), "create session response");
+    return parseWithFallback(
+      sessionSchema,
+      raw,
+      createSessionFallback(raw, { title }),
+      "create session response",
+    );
   }
 
   async getSession(sessionId: string): Promise<Session> {
@@ -281,10 +335,19 @@ export class ApiClient {
 
   async listMessages(sessionId: string): Promise<Message[]> {
     const raw = await this.fetchJson(`/api/sessions/${sessionId}/messages`);
-    return parseWithFallback(messageArraySchema, raw, [], "messages list response");
+    return parseWithFallback(
+      messageArraySchema,
+      raw,
+      [],
+      "messages list response",
+    );
   }
 
-  async appendMessage(sessionId: string, role: MessageRole, content: string): Promise<Message> {
+  async appendMessage(
+    sessionId: string,
+    role: MessageRole,
+    content: string,
+  ): Promise<Message> {
     const raw = await this.fetchJson(`/api/sessions/${sessionId}/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

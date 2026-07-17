@@ -1,6 +1,6 @@
 # Chatbot Experiments
 
-Standalone DentalTrip AI chat stack extracted from `/home/nampq/workspace/src/dentaltrip/dentaltrip-ai`.
+Standalone Chatbot Experiments chat stack.
 
 ## Structure
 

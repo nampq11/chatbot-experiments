@@ -1,6 +1,6 @@
 import { once } from "node:events";
 import { createServer } from "node:http";
-import { RealtimeHub } from "@dentaltrip-ai/core/realtime";
+import { RealtimeHub } from "@chatbot-experiments/core/realtime";
 import type { RequestHandler } from "express";
 import express from "express";
 import { describe, expect, it } from "vitest";
@@ -23,7 +23,9 @@ interface RealtimeServerFixture {
   readonly transport: RealtimeStreamTransport;
 }
 
-async function createRealtimeServer(options: RealtimeServerOptions = {}): Promise<RealtimeServerFixture> {
+async function createRealtimeServer(
+  options: RealtimeServerOptions = {},
+): Promise<RealtimeServerFixture> {
   const app = express();
   const transport = createRealtimeStreamTransport(options.streamOptions);
 
@@ -81,7 +83,8 @@ describe("createRealtimeStreamTransport", () => {
     const { server } = await createRealtimeServer({
       streamOptions: {
         hub,
-        validateSessionOwnership: async (sessionId, userId) => sessionId === "session-123" && userId === "user-1",
+        validateSessionOwnership: async (sessionId, userId) =>
+          sessionId === "session-123" && userId === "user-1",
       },
     });
 
@@ -118,7 +121,8 @@ describe("createRealtimeStreamTransport", () => {
   it("rejects session-scoped streams for non-owners", async () => {
     const { server } = await createRealtimeServer({
       streamOptions: {
-        validateSessionOwnership: async (sessionId, userId) => sessionId === "session-owned" && userId === "owner-user",
+        validateSessionOwnership: async (sessionId, userId) =>
+          sessionId === "session-owned" && userId === "owner-user",
       },
     });
 
@@ -242,7 +246,10 @@ describe("createRealtimeStreamTransport", () => {
         const { value, done } = await Promise.race([
           reader.read(),
           new Promise<never>((_resolve, reject) => {
-            setTimeout(() => reject(new Error("timed out waiting for SSE payload")), 1000);
+            setTimeout(
+              () => reject(new Error("timed out waiting for SSE payload")),
+              1000,
+            );
           }),
         ]);
 

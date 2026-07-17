@@ -1,4 +1,4 @@
-import { Agent, type StreamFn } from "@dentaltrip-ai/agent-core";
+import { Agent, type StreamFn } from "@chatbot-experiments/agent-core";
 import {
   type Message as AgentMessage,
   type AzureOpenAIResponsesOptions,
@@ -6,13 +6,17 @@ import {
   type Model,
   type SimpleStreamOptions,
   streamSimple,
-} from "@dentaltrip-ai/ai";
-import { type AzureOpenAIConfig, loadAzureOpenAIConfig } from "../azure-openai.ts";
-import { DENTALTRIP_SYSTEM_PROMPT } from "../system-prompt.ts";
+} from "@chatbot-experiments/ai";
+import {
+  type AzureOpenAIConfig,
+  loadAzureOpenAIConfig,
+} from "../azure-openai.ts";
+import { CHATBOT_EXPERIMENTS_SYSTEM_PROMPT } from "../system-prompt.ts";
 
 const AGENT_MODEL_ID = "gpt-5.4-nano";
 const DEFAULT_THINKING_LEVEL = "medium";
-const IMAGE_INPUT_UNSUPPORTED_TEXT = "Image input is not supported by the configured model.";
+const IMAGE_INPUT_UNSUPPORTED_TEXT =
+  "Image input is not supported by the configured model.";
 
 /** Reasoning level passed to provider-backed assistant calls. */
 export type ThinkingLevel = "off" | "low" | "medium" | "high";
@@ -43,7 +47,10 @@ export function resolveAgentModel(): Model {
 }
 
 /** Returns a thinking level that is safe for the selected model. */
-export function resolveThinkingLevel(model: Model, requestedThinkingLevel?: ThinkingLevel): ThinkingLevel {
+export function resolveThinkingLevel(
+  model: Model,
+  requestedThinkingLevel?: ThinkingLevel,
+): ThinkingLevel {
   const thinkingLevel = requestedThinkingLevel ?? DEFAULT_THINKING_LEVEL;
 
   if (!model.reasoning || thinkingLevel === "off") {
@@ -54,23 +61,35 @@ export function resolveThinkingLevel(model: Model, requestedThinkingLevel?: Thin
 }
 
 /** Removes image content when the selected model only accepts text input. */
-export function filterUnsupportedImages(messages: AgentMessage[], model: Model): AgentMessage[] {
+export function filterUnsupportedImages(
+  messages: AgentMessage[],
+  model: Model,
+): AgentMessage[] {
   if (model.input.includes("image")) {
     return messages;
   }
 
   return messages.map((message) => {
-    if ((message.role !== "user" && message.role !== "toolResult") || !Array.isArray(message.content)) {
+    if (
+      (message.role !== "user" && message.role !== "toolResult") ||
+      !Array.isArray(message.content)
+    ) {
       return message;
     }
 
-    const hasImages = message.content.some((content) => content.type === "image");
+    const hasImages = message.content.some(
+      (content) => content.type === "image",
+    );
     if (!hasImages) {
       return message;
     }
 
     const content = message.content
-      .map((part) => (part.type === "image" ? { type: "text" as const, text: IMAGE_INPUT_UNSUPPORTED_TEXT } : part))
+      .map((part) =>
+        part.type === "image"
+          ? { type: "text" as const, text: IMAGE_INPUT_UNSUPPORTED_TEXT }
+          : part,
+      )
       .filter((part, index, parts) => {
         const previousPart = parts[index - 1];
 
@@ -87,9 +106,15 @@ export function filterUnsupportedImages(messages: AgentMessage[], model: Model):
 }
 
 /** Converts agent transcript messages to the provider-facing LLM transcript. */
-function convertAgentMessagesToLlm(messages: AgentMessage[], model: Model): AgentMessage[] {
+function convertAgentMessagesToLlm(
+  messages: AgentMessage[],
+  model: Model,
+): AgentMessage[] {
   const llmMessages = messages.filter(
-    (message) => message.role === "user" || message.role === "assistant" || message.role === "toolResult",
+    (message) =>
+      message.role === "user" ||
+      message.role === "assistant" ||
+      message.role === "toolResult",
   );
 
   return filterUnsupportedImages(llmMessages, model);
@@ -104,12 +129,15 @@ export function createAgent(options: CreateAgentOptions): Agent {
     initialState: {
       model,
       messages: options.messages ?? [],
-      systemPrompt: options.systemPrompt ?? DENTALTRIP_SYSTEM_PROMPT,
+      systemPrompt: options.systemPrompt ?? CHATBOT_EXPERIMENTS_SYSTEM_PROMPT,
       thinkingLevel,
       tools: [],
     },
     convertToLlm: (messages) => convertAgentMessagesToLlm(messages, model),
-    streamFn: createThinkingStreamFn(thinkingLevel, options.azureOpenAIConfigProvider),
+    streamFn: createThinkingStreamFn(
+      thinkingLevel,
+      options.azureOpenAIConfigProvider,
+    ),
     sessionId: options.sessionId,
   });
 }
@@ -122,13 +150,19 @@ export function createThinkingStreamFn(
   return (model, context, options) => {
     const azureConfig = azureOpenAIConfigProvider();
     const resolvedThinkingLevel = resolveThinkingLevel(model, thinkingLevel);
-    const reasoningOptions = toReasoningStreamOptions(options, resolvedThinkingLevel, model.reasoning);
+    const reasoningOptions = toReasoningStreamOptions(
+      options,
+      resolvedThinkingLevel,
+      model.reasoning,
+    );
 
     const streamOptions: ReasoningStreamOptions = {
       ...reasoningOptions,
       azureEndpoint: azureConfig.endpoint,
       azureApiKey: azureConfig.apiKey,
-      ...(azureConfig.apiVersion ? { azureApiVersion: azureConfig.apiVersion } : {}),
+      ...(azureConfig.apiVersion
+        ? { azureApiVersion: azureConfig.apiVersion }
+        : {}),
     };
 
     return streamSimple(model, context, streamOptions);

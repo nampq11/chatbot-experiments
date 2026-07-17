@@ -1,19 +1,30 @@
 import { randomUUID } from "node:crypto";
-import type { Agent, AgentEvent } from "@dentaltrip-ai/agent-core";
-import type { Message as AgentMessage, Model } from "@dentaltrip-ai/ai";
-import type { AgentRunStore, AgentStreamEvent } from "@dentaltrip-ai/core/agent";
-import type { DomainEvent } from "@dentaltrip-ai/core/events";
-import type { SessionRepository } from "@dentaltrip-ai/core/session";
+import type { Agent, AgentEvent } from "@chatbot-experiments/agent-core";
+import type { Message as AgentMessage, Model } from "@chatbot-experiments/ai";
+import type {
+  AgentRunStore,
+  AgentStreamEvent,
+} from "@chatbot-experiments/core/agent";
+import type { DomainEvent } from "@chatbot-experiments/core/events";
+import type { SessionRepository } from "@chatbot-experiments/core/session";
 import type { ThinkingLevel } from "./agent.ts";
-import { extractAgentMessageText, toSessionDataMessagePayload } from "./transcript-mapper.ts";
+import {
+  extractAgentMessageText,
+  toSessionDataMessagePayload,
+} from "./transcript-mapper.ts";
 
 type TranscriptWriter = Pick<SessionRepository, "appendMessage">;
-type WithoutStreamRouting<T> = T extends unknown ? Omit<T, "sessionId" | "messageId"> : never;
+type WithoutStreamRouting<T> = T extends unknown
+  ? Omit<T, "sessionId" | "messageId">
+  : never;
 
 type AgentStreamEventPayload = WithoutStreamRouting<AgentStreamEvent>;
 
 type RuntimeAgent = Pick<Agent, "continue" | "abort" | "subscribe" | "state">;
-type AgentLifecycleEvent = Extract<AgentEvent, { type: "agent_start" | "agent_end" }>;
+type AgentLifecycleEvent = Extract<
+  AgentEvent,
+  { type: "agent_start" | "agent_end" }
+>;
 
 /** Creates an agent instance for a session actor. */
 export type CreateAgentFn = (input: {
@@ -33,7 +44,10 @@ export interface SessionActorSendMessageInput {
   onStreamEvent?: (event: AgentStreamEvent) => void;
 }
 
-type ProcessSessionMessageInput = Omit<SessionActorSendMessageInput, "runId"> & {
+type ProcessSessionMessageInput = Omit<
+  SessionActorSendMessageInput,
+  "runId"
+> & {
   readonly runId: string;
 };
 
@@ -113,8 +127,17 @@ export class SessionActor {
     });
   }
 
-  private async processMessage(input: ProcessSessionMessageInput): Promise<void> {
-    const { messageId, content, signal, assistantMessageId, onStreamEvent, runId } = input;
+  private async processMessage(
+    input: ProcessSessionMessageInput,
+  ): Promise<void> {
+    const {
+      messageId,
+      content,
+      signal,
+      assistantMessageId,
+      onStreamEvent,
+      runId,
+    } = input;
 
     this.agent.state.messages.push({
       role: "user",
@@ -134,7 +157,8 @@ export class SessionActor {
     let assistantErrorMessageId: string | null = null;
     const contentfulAssistantMessageIds: string[] = [];
     let activeAssistantMessage: { id: string; started: boolean } | null = null;
-    let finalAgentEvent: Extract<AgentEvent, { type: "agent_end" }> | null = null;
+    let finalAgentEvent: Extract<AgentEvent, { type: "agent_end" }> | null =
+      null;
     let publishedAgentStart = false;
 
     const publishAgentEvent = (event: AgentLifecycleEvent) => {
@@ -154,8 +178,14 @@ export class SessionActor {
       publishAgentEvent({ type: "agent_start" });
     };
 
-    const publishAgentEnd = (status: "completed" | "failed" | "cancelled", errorMessage?: string) => {
-      if (finalAgentEvent?.status === status && (finalAgentEvent.errorMessage || !errorMessage)) {
+    const publishAgentEnd = (
+      status: "completed" | "failed" | "cancelled",
+      errorMessage?: string,
+    ) => {
+      if (
+        finalAgentEvent?.status === status &&
+        (finalAgentEvent.errorMessage || !errorMessage)
+      ) {
         publishAgentEvent(finalAgentEvent);
         return;
       }
@@ -187,7 +217,10 @@ export class SessionActor {
       return activeAssistantMessage;
     };
 
-    const emitStreamEvent = (messageId: string, event: AgentStreamEventPayload) => {
+    const emitStreamEvent = (
+      messageId: string,
+      event: AgentStreamEventPayload,
+    ) => {
       if (!onStreamEvent) {
         return;
       }
@@ -269,9 +302,14 @@ export class SessionActor {
         let hasVisibleContent = false;
         let endedAssistantMessage = activeAssistantMessage;
 
-        if (typeof event.message.errorMessage === "string" && event.message.errorMessage.length > 0) {
+        if (
+          typeof event.message.errorMessage === "string" &&
+          event.message.errorMessage.length > 0
+        ) {
           assistantErrorMessage = event.message.errorMessage;
-          console.error(`[agent] assistant stream error for session ${this.sessionId}: ${event.message.errorMessage}`);
+          console.error(
+            `[agent] assistant stream error for session ${this.sessionId}: ${event.message.errorMessage}`,
+          );
         }
 
         const assistantMessage = extractAgentMessageText(event.message);
@@ -305,7 +343,8 @@ export class SessionActor {
       this.throwIfAborted(signal);
 
       if (assistantErrorMessage) {
-        const errorMessageId = assistantErrorMessageId ?? getActiveAssistantMessage().id;
+        const errorMessageId =
+          assistantErrorMessageId ?? getActiveAssistantMessage().id;
         emitStreamEvent(errorMessageId, {
           type: "assistant.message",
           message: `Agent error: ${assistantErrorMessage}`,
@@ -314,10 +353,11 @@ export class SessionActor {
       }
 
       this.throwIfAborted(signal);
-      const persistedAssistantMessageIds = await this.persistNewAssistantMessages(
-        initialMessageCount,
-        contentfulAssistantMessageIds,
-      );
+      const persistedAssistantMessageIds =
+        await this.persistNewAssistantMessages(
+          initialMessageCount,
+          contentfulAssistantMessageIds,
+        );
       this.throwIfAborted(signal);
 
       await this.agentRunStore.updateAgentRun(runId, {
@@ -333,7 +373,8 @@ export class SessionActor {
     } catch (error: unknown) {
       const aborted = signal?.aborted === true;
 
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       await this.agentRunStore.updateAgentRun(runId, {
         status: aborted ? "cancelled" : "failed",
@@ -405,7 +446,9 @@ export class SessionActor {
       this.isConsumingQueue = false;
 
       if (this.isClosed) {
-        this.rejectQueuedMessages(new Error(`Session ${this.sessionId} is closed`));
+        this.rejectQueuedMessages(
+          new Error(`Session ${this.sessionId} is closed`),
+        );
       } else if (this.messageQueue.length > 0) {
         this.startQueueConsumer();
       }
@@ -440,7 +483,8 @@ export class SessionActor {
         continue;
       }
 
-      const messageId = assistantMessageIds[persistedAssistantCount] ?? randomUUID();
+      const messageId =
+        assistantMessageIds[persistedAssistantCount] ?? randomUUID();
 
       await this.transcriptWriter.appendMessage({
         id: messageId,
@@ -468,6 +512,9 @@ export class SessionActor {
 
   /** Removes non-persisted assistant/tool messages produced by a cancelled run. */
   private truncateGeneratedMessages(initialMessageCount: number): void {
-    this.agent.state.messages = this.agent.state.messages.slice(0, initialMessageCount);
+    this.agent.state.messages = this.agent.state.messages.slice(
+      0,
+      initialMessageCount,
+    );
   }
 }

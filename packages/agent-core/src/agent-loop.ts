@@ -4,7 +4,7 @@ import type {
   Message,
   SimpleStreamOptions,
   ToolCall,
-} from "@dentaltrip-ai/llm-core";
+} from "@chatbot-experiments/llm-core";
 import type {
   AgentContext,
   AgentEndStatus,
@@ -22,10 +22,15 @@ const MAX_TOOL_TURNS = 128;
 type AgentEndResult = { status: AgentEndStatus; errorMessage?: string };
 
 function extractToolCalls(message: AssistantMessage): ToolCall[] {
-  return message.content.filter((part): part is ToolCall => part.type === "toolCall");
+  return message.content.filter(
+    (part): part is ToolCall => part.type === "toolCall",
+  );
 }
 
-function createAgentEndResult(status: AgentEndStatus, errorMessage?: string): AgentEndResult {
+function createAgentEndResult(
+  status: AgentEndStatus,
+  errorMessage?: string,
+): AgentEndResult {
   if (errorMessage) {
     return { status, errorMessage };
   }
@@ -45,7 +50,11 @@ function resolveAgentEnd(message: AssistantMessage): AgentEndResult {
   return { status: "completed" };
 }
 
-function createToolResultMessage(toolCall: ToolCall, content: string, isError: boolean): Message {
+function createToolResultMessage(
+  toolCall: ToolCall,
+  content: string,
+  isError: boolean,
+): Message {
   return {
     role: "toolResult",
     toolCallId: toolCall.id,
@@ -157,7 +166,11 @@ async function loop(
     await emit(event);
   };
 
-  const assistantMessage = await collectStreamIntoMessage(eventStream, emitWithStreamingStage, signal);
+  const assistantMessage = await collectStreamIntoMessage(
+    eventStream,
+    emitWithStreamingStage,
+    signal,
+  );
   await emit({ type: "message_end", message: assistantMessage });
   messages.push(assistantMessage);
   await checkStage("post_stream");
@@ -176,7 +189,11 @@ async function loop(
     if (followUps.length > 0) {
       messages.push(...followUps);
     }
-    await emit({ type: "turn_end", message: assistantMessage, toolResults: [] });
+    await emit({
+      type: "turn_end",
+      message: assistantMessage,
+      toolResults: [],
+    });
     await finishRun(resolveAgentEnd(assistantMessage));
     return;
   }
@@ -186,13 +203,28 @@ async function loop(
   }
 
   await checkStage("pre_tool");
-  const toolResults = await executeToolCalls(toolCalls, context.tools, config, emit, signal, async () => {
-    await checkStage("tool_exec");
-  });
+  const toolResults = await executeToolCalls(
+    toolCalls,
+    context.tools,
+    config,
+    emit,
+    signal,
+    async () => {
+      await checkStage("tool_exec");
+    },
+  );
   messages.push(...toolResults);
   await emit({ type: "turn_end", message: assistantMessage, toolResults });
   await checkStage("post_tool");
-  await loop(messages, context, config, emit, signal, streamFn, toolTurnCount + 1);
+  await loop(
+    messages,
+    context,
+    config,
+    emit,
+    signal,
+    streamFn,
+    toolTurnCount + 1,
+  );
 }
 
 async function collectStreamIntoMessage(
@@ -238,7 +270,9 @@ async function collectStreamIntoMessage(
       case "error": {
         const errorMessage =
           event.error.errorMessage ||
-          (event.reason === "aborted" ? "Assistant stream was aborted." : "Assistant stream failed.");
+          (event.reason === "aborted"
+            ? "Assistant stream was aborted."
+            : "Assistant stream failed.");
         throw new Error(errorMessage);
       }
       default:
@@ -250,7 +284,9 @@ async function collectStreamIntoMessage(
     return finalMessage;
   }
 
-  throw new Error("Assistant stream ended without a terminal done or error event.");
+  throw new Error(
+    "Assistant stream ended without a terminal done or error event.",
+  );
 }
 
 async function executeToolCalls(
@@ -298,7 +334,13 @@ async function executeToolCalls(
         toolName: toolCall.name,
         isError: false,
       });
-      results.push(createToolResultMessage(toolCall, before.result ?? "Tool call skipped.", false));
+      results.push(
+        createToolResultMessage(
+          toolCall,
+          before.result ?? "Tool call skipped.",
+          false,
+        ),
+      );
       continue;
     }
 
@@ -308,18 +350,25 @@ async function executeToolCalls(
 
     if (tool) {
       try {
-        const prepared = tool.prepareArguments ? tool.prepareArguments(args) : args;
-        const result = await tool.execute(toolCall.id, prepared as never, signal, (update) => {
-          updateEvents.push(
-            emit({
-              type: "tool_execution_update",
-              toolCallId: toolCall.id,
-              toolName: toolCall.name,
-              args,
-              update,
-            }),
-          );
-        });
+        const prepared = tool.prepareArguments
+          ? tool.prepareArguments(args)
+          : args;
+        const result = await tool.execute(
+          toolCall.id,
+          prepared as never,
+          signal,
+          (update) => {
+            updateEvents.push(
+              emit({
+                type: "tool_execution_update",
+                toolCallId: toolCall.id,
+                toolName: toolCall.name,
+                args,
+                update,
+              }),
+            );
+          },
+        );
         output = result.content;
         isError = result.isError ?? false;
       } catch (error) {

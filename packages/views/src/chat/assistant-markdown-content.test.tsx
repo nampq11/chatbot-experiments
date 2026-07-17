@@ -5,10 +5,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // which transitively pulls react-markdown/marked and matchMedia-based hooks
 // into jsdom. The hook itself only needs React + its pure helpers, so stub the
 // UI surface to keep this a focused logic test (no next/* mocked, per convention).
-vi.mock("@dentaltrip-ai/ui", () => ({
+vi.mock("@chatbot-experiments/ui", () => ({
   cn: (...args: unknown[]) => args.filter(Boolean).join(" "),
 }));
-vi.mock("@dentaltrip-ai/ui/components/ui/message", () => ({
+vi.mock("@chatbot-experiments/ui/components/ui/message", () => ({
   MessageContent: () => null,
 }));
 

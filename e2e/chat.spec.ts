@@ -98,10 +98,10 @@ function getSendMessageButton(page: Page) {
 async function expectEmptyChatHeroLayout(page: Page) {
   const main = page.locator("#main-content");
   const greeting = page.getByRole("heading", {
-    name: /Plan your dental trip to Vietnam/,
+    name: /Design your next chatbot experiment/,
   });
   const starterPrompt = page.getByRole("button", {
-    name: /Estimate Vietnam treatment costs/,
+    name: /Scope a chatbot experiment/,
   });
   const textarea = getMessageInput(page);
 
@@ -864,11 +864,11 @@ test.describe("Streaming Assistant Markdown", () => {
     const assistantMarkdown = [
       "For a more accurate estimate, send me these details:",
       "",
-      "1. **What treatment are you considering?**  ",
-      "Example: 1 implant, 6 crowns, veneers, root canal + crown, All-on-4",
+      "1. **What workflow are you testing?**  ",
+      "Example: support triage, lead qualification, onboarding, research assistant",
       "",
-      "2. **How many teeth are involved, and which area?**  ",
-      "Front teeth, back teeth, upper/lower, full mouth",
+      "2. **Which users and channels are involved?**  ",
+      "Internal team, customers, website chat, Slack, or email",
     ].join("\n");
 
     await mockStreamingChatSession(page, { sessionId, assistantMarkdown });
@@ -876,10 +876,10 @@ test.describe("Streaming Assistant Markdown", () => {
 
     const assistantContent = page.locator(".prose").last();
     await expect(
-      assistantContent.getByText("What treatment are you considering?"),
+      assistantContent.getByText("What workflow are you testing?"),
     ).toBeVisible();
     await expect(
-      assistantContent.getByText("How many teeth are involved"),
+      assistantContent.getByText("Which users and channels are involved"),
     ).toBeVisible();
 
     const markerGaps = await measureAssistantListMarkerGaps(page);
@@ -1267,9 +1267,9 @@ test.describe("Streaming Assistant Markdown", () => {
       "",
       "## Secondary generated heading",
       "",
-      "| ProcedureLongLabelWithoutSpaces | CityLongLabelWithoutSpaces | ClinicLongLabelWithoutSpaces | DurationLongLabelWithoutSpaces | PriceLongLabelWithoutSpaces | NotesLongLabelWithoutSpaces |",
+      "| ExperimentLongLabelWithoutSpaces | AudienceLongLabelWithoutSpaces | ModelLongLabelWithoutSpaces | DurationLongLabelWithoutSpaces | CostLongLabelWithoutSpaces | NotesLongLabelWithoutSpaces |",
       "|---|---|---|---|---:|---|",
-      "| ImplantConsultationAndPlanning | HoChiMinhCityDistrictOne | InternationalDentalClinic | ThreeToSevenBusinessDays | $1200 | IncludesImagingAndFollowUp |",
+      "| RetrievalAugmentedSupportBot | InternalOperationsTeam | HostedLanguageModel | ThreeToSevenBusinessDays | $1200 | IncludesEvaluationAndFollowUp |",
     ].join("\n");
 
     await page.setViewportSize({ width: 1920, height: 927 });
@@ -1480,7 +1480,7 @@ test.describe("Chat Application", () => {
   test("creating a new session and sending a message", async ({ page }) => {
     await page.waitForLoadState("networkidle");
 
-    await sendChatMessage(page, "What is dental tourism?");
+    await sendChatMessage(page, "What is chatbot experimentation?");
     await page.waitForTimeout(2500);
   });
 
@@ -1520,7 +1520,10 @@ test.describe("Chat Application", () => {
     await sendChatMessage(page, "Hello");
     await page.waitForTimeout(500);
 
-    await sendChatMessage(page, "What can you tell me about dental implants?");
+    await sendChatMessage(
+      page,
+      "What can you tell me about retrieval-augmented chatbots?",
+    );
     await page.waitForTimeout(500);
   });
 
@@ -1551,7 +1554,7 @@ test.describe("Chat API Integration", () => {
     await goToChat(page);
     await page.waitForLoadState("networkidle");
 
-    await sendChatMessage(page, "Tell me about dental care");
+    await sendChatMessage(page, "Tell me about chatbot evaluation");
     await page.waitForTimeout(3000);
   });
 
@@ -1608,84 +1611,83 @@ test.describe("Short User Message Bubble", () => {
   });
 });
 
-test.describe
-  .serial("Delete Session", () => {
-    test("shows delete button on hover over session item", async ({ page }) => {
-      await goToChat(page);
-      await page.waitForLoadState("networkidle");
+test.describe.serial("Delete Session", () => {
+  test("shows delete button on hover over session item", async ({ page }) => {
+    await goToChat(page);
+    await page.waitForLoadState("networkidle");
 
-      const title = `Test session for delete ${Date.now()}`;
-      await sendFirstMessageAndWaitForSession(page, title);
+    const title = `Test session for delete ${Date.now()}`;
+    await sendFirstMessageAndWaitForSession(page, title);
 
-      const deleteButton = await getSessionDeleteButton(page, title);
-      await expect(deleteButton).toBeVisible();
-    });
-
-    test("opens confirmation dialog when clicking delete button", async ({
-      page,
-    }) => {
-      await goToChat(page);
-      await page.waitForLoadState("networkidle");
-
-      const title = `Session to delete ${Date.now()}`;
-      await sendFirstMessageAndWaitForSession(page, title);
-      await openDeleteDialogForSession(page, title);
-
-      const dialog = page.getByRole("alertdialog");
-      await expect(dialog).toBeVisible();
-      await expect(
-        dialog.getByRole("heading", { name: /delete/i }),
-      ).toBeVisible();
-    });
-
-    test("cancels deletion when clicking Cancel button", async ({ page }) => {
-      await goToChat(page);
-      await page.waitForLoadState("networkidle");
-
-      const uniqueMessage = `Cancel test session ${Date.now()}`;
-      await sendFirstMessageAndWaitForSession(page, uniqueMessage);
-      await openDeleteDialogForSession(page, uniqueMessage);
-
-      await page.getByRole("button", { name: "Cancel", exact: true }).click();
-      await expect(page.getByRole("alertdialog")).toBeHidden();
-      await getSessionLink(page, uniqueMessage);
-    });
-
-    test("deletes session when clicking Delete button", async ({ page }) => {
-      await goToChat(page);
-      await page.waitForLoadState("networkidle");
-
-      const uniqueMessage = `Delete test session ${Date.now()}`;
-      await sendFirstMessageAndWaitForSession(page, uniqueMessage);
-      await openDeleteDialogForSession(page, uniqueMessage);
-
-      await page
-        .getByRole("button", { name: "Delete Chat", exact: true })
-        .click();
-      await expect(
-        page.getByRole("link", { name: uniqueMessage, exact: true }),
-      ).toHaveCount(0);
-    });
-
-    test("clears active session when deleting current session", async ({
-      page,
-    }) => {
-      await goToChat(page);
-      await page.waitForLoadState("networkidle");
-
-      const uniqueMessage = `Active session to delete ${Date.now()}`;
-      await sendFirstMessageAndWaitForSession(page, uniqueMessage);
-
-      await openDeleteDialogForSession(page, uniqueMessage);
-      await page
-        .getByRole("button", { name: "Delete Chat", exact: true })
-        .click();
-
-      await expect(page).toHaveURL(/\/chat$/);
-      const centeredContainer = page
-        .locator("main > div")
-        .filter({ hasText: "" })
-        .first();
-      await expect(centeredContainer).toBeVisible();
-    });
+    const deleteButton = await getSessionDeleteButton(page, title);
+    await expect(deleteButton).toBeVisible();
   });
+
+  test("opens confirmation dialog when clicking delete button", async ({
+    page,
+  }) => {
+    await goToChat(page);
+    await page.waitForLoadState("networkidle");
+
+    const title = `Session to delete ${Date.now()}`;
+    await sendFirstMessageAndWaitForSession(page, title);
+    await openDeleteDialogForSession(page, title);
+
+    const dialog = page.getByRole("alertdialog");
+    await expect(dialog).toBeVisible();
+    await expect(
+      dialog.getByRole("heading", { name: /delete/i }),
+    ).toBeVisible();
+  });
+
+  test("cancels deletion when clicking Cancel button", async ({ page }) => {
+    await goToChat(page);
+    await page.waitForLoadState("networkidle");
+
+    const uniqueMessage = `Cancel test session ${Date.now()}`;
+    await sendFirstMessageAndWaitForSession(page, uniqueMessage);
+    await openDeleteDialogForSession(page, uniqueMessage);
+
+    await page.getByRole("button", { name: "Cancel", exact: true }).click();
+    await expect(page.getByRole("alertdialog")).toBeHidden();
+    await getSessionLink(page, uniqueMessage);
+  });
+
+  test("deletes session when clicking Delete button", async ({ page }) => {
+    await goToChat(page);
+    await page.waitForLoadState("networkidle");
+
+    const uniqueMessage = `Delete test session ${Date.now()}`;
+    await sendFirstMessageAndWaitForSession(page, uniqueMessage);
+    await openDeleteDialogForSession(page, uniqueMessage);
+
+    await page
+      .getByRole("button", { name: "Delete Chat", exact: true })
+      .click();
+    await expect(
+      page.getByRole("link", { name: uniqueMessage, exact: true }),
+    ).toHaveCount(0);
+  });
+
+  test("clears active session when deleting current session", async ({
+    page,
+  }) => {
+    await goToChat(page);
+    await page.waitForLoadState("networkidle");
+
+    const uniqueMessage = `Active session to delete ${Date.now()}`;
+    await sendFirstMessageAndWaitForSession(page, uniqueMessage);
+
+    await openDeleteDialogForSession(page, uniqueMessage);
+    await page
+      .getByRole("button", { name: "Delete Chat", exact: true })
+      .click();
+
+    await expect(page).toHaveURL(/\/chat$/);
+    const centeredContainer = page
+      .locator("main > div")
+      .filter({ hasText: "" })
+      .first();
+    await expect(centeredContainer).toBeVisible();
+  });
+});

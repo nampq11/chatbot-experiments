@@ -4,12 +4,12 @@ import {
   useChatStore,
   useMessages,
   useRealtime,
-} from "@dentaltrip-ai/client/chat";
-import { Button, cn, ErrorState } from "@dentaltrip-ai/ui";
+} from "@chatbot-experiments/client/chat";
+import { Button, cn, ErrorState } from "@chatbot-experiments/ui";
 import {
   SidebarTrigger,
   useSidebar,
-} from "@dentaltrip-ai/ui/components/ui/sidebar";
+} from "@chatbot-experiments/ui/components/ui/sidebar";
 import { ChatGreeting } from "./chat-greeting";
 import { ChatInput } from "./chat-input";
 import {
@@ -76,8 +76,8 @@ function CenteredChatInput({
               className={CHAT_HERO_GREETING_CLASS}
             />
             <p className="mx-auto max-w-xl text-balance text-sm leading-6 text-muted-foreground sm:text-base">
-              Compare costs, clinic fit, travel timing, and next steps before
-              you book dental care in Vietnam.
+              Compare prompts, model behavior, evaluation results, and next
+              steps before you ship a chatbot workflow.
             </p>
           </div>
         </div>

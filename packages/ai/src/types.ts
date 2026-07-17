@@ -1,4 +1,4 @@
-import type { AzureOpenAIResponsesStreamOptions } from "@dentaltrip-ai/llm-core";
+import type { AzureOpenAIResponsesStreamOptions } from "@chatbot-experiments/llm-core";
 
 export type {
   AnthropicMessagesCompat,
@@ -44,13 +44,13 @@ export type {
   TSchema,
   Usage,
   UserMessage,
-} from "@dentaltrip-ai/llm-core";
+} from "@chatbot-experiments/llm-core";
 export {
   isImageContent,
   isTextContent,
   isToolCall,
   Type,
-} from "@dentaltrip-ai/llm-core";
+} from "@chatbot-experiments/llm-core";
 
 /** Explicit Azure OpenAI Responses options injected by the server runtime. */
 export type AzureOpenAIResponsesOptions = AzureOpenAIResponsesStreamOptions;

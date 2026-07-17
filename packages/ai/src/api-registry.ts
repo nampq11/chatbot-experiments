@@ -6,7 +6,7 @@ import type {
   SimpleStreamOptions,
   StreamFunction,
   StreamOptions,
-} from "@dentaltrip-ai/llm-core";
+} from "@chatbot-experiments/llm-core";
 
 /** Type-erased provider stream function stored in the registry. */
 export type ApiStreamFunction = (
@@ -23,7 +23,10 @@ export type ApiStreamSimpleFunction = (
 ) => AssistantMessageEventStreamContract;
 
 /** Provider adapter registered for a specific API. */
-export interface ApiProvider<TApi extends Api = Api, TOptions extends StreamOptions = StreamOptions> {
+export interface ApiProvider<
+  TApi extends Api = Api,
+  TOptions extends StreamOptions = StreamOptions,
+> {
   api: TApi;
   stream: StreamFunction<TApi, TOptions>;
   streamSimple: StreamFunction<TApi, SimpleStreamOptions>;
@@ -67,10 +70,10 @@ function wrapStreamSimple<TApi extends Api>(
 }
 
 /** Registers a provider for one API identifier. */
-export function registerApiProvider<TApi extends Api, TOptions extends StreamOptions>(
-  provider: ApiProvider<TApi, TOptions>,
-  sourceId?: string,
-): void {
+export function registerApiProvider<
+  TApi extends Api,
+  TOptions extends StreamOptions,
+>(provider: ApiProvider<TApi, TOptions>, sourceId?: string): void {
   apiProviderRegistry.set(provider.api, {
     provider: {
       api: provider.api,

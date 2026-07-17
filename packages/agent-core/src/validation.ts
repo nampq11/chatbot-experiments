@@ -1,1 +1,1 @@
-export { validateToolArguments } from "@dentaltrip-ai/llm-core";
+export { validateToolArguments } from "@chatbot-experiments/llm-core";

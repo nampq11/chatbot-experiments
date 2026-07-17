@@ -1,12 +1,12 @@
 "use client";
 
-import { cn } from "@dentaltrip-ai/ui";
+import { cn } from "@chatbot-experiments/ui";
 import {
-  CalendarDays,
-  CircleDollarSign,
+  BarChart3,
+  Bot,
+  ClipboardCheck,
   type LucideIcon,
-  MapPinned,
-  Stethoscope,
+  Workflow,
 } from "lucide-react";
 
 type StarterPrompt = {
@@ -18,32 +18,32 @@ type StarterPrompt = {
 
 const STARTER_PROMPTS: StarterPrompt[] = [
   {
-    title: "Estimate Vietnam treatment costs",
-    description: "Price ranges, quote accuracy, and next details",
+    title: "Scope a chatbot experiment",
+    description: "Goal, audience, constraints, and success metrics",
     prompt:
-      "I’m considering dental treatment in Vietnam. Help me understand likely cost ranges and what details you need from me for a more accurate estimate.",
-    Icon: CircleDollarSign,
+      "Help me scope a chatbot experiment. Ask only the essential questions about the goal, target users, constraints, and how we should measure success.",
+    Icon: ClipboardCheck,
   },
   {
-    title: "Shortlist clinic options",
-    description: "Match treatment, budget, travel dates, and support",
+    title: "Compare model options",
+    description: "Quality, latency, cost, and reliability tradeoffs",
     prompt:
-      "Help me narrow down clinic options in Vietnam. Ask only the few essential questions you need about treatment, budget, travel dates, and preferences.",
-    Icon: MapPinned,
+      "Help me compare model options for a chatbot prototype. Focus on quality, latency, cost, reliability, and what we should test before deciding.",
+    Icon: BarChart3,
   },
   {
-    title: "Plan treatment travel timing",
-    description: "Trip length, recovery days, and follow-up windows",
+    title: "Design a conversation flow",
+    description: "Prompts, states, fallbacks, and handoff paths",
     prompt:
-      "Help me plan the travel timeline for dental treatment in Vietnam, including consultation, procedure, recovery, and follow-up.",
-    Icon: CalendarDays,
+      "Help me design a conversation flow for a chatbot workflow, including key prompts, user states, fallback behavior, and handoff paths.",
+    Icon: Workflow,
   },
   {
-    title: "Choose a treatment path",
-    description: "Understand likely options before a consultation",
+    title: "Plan chatbot evaluation",
+    description: "Test cases, metrics, logs, and iteration plan",
     prompt:
-      "I’m not sure which dental treatment I need. Ask me questions to understand my concern and explain the likely options.",
-    Icon: Stethoscope,
+      "Help me plan an evaluation for a chatbot prototype. Suggest test cases, metrics, logging, and how to use the results for the next iteration.",
+    Icon: Bot,
   },
 ];
 
@@ -53,7 +53,7 @@ type ChatStarterPromptsProps = {
   className?: string;
 };
 
-/** Renders dental-tourism starter prompts that start a focused assistant flow. */
+/** Renders starter prompts that start a focused chatbot experiment flow. */
 export function ChatStarterPrompts({
   onSelectPrompt,
   disabled = false,
@@ -66,7 +66,9 @@ export function ChatStarterPrompts({
         className,
       )}
     >
-      <legend className="sr-only">Suggested dental trip questions</legend>
+      <legend className="sr-only">
+        Suggested chatbot experiment questions
+      </legend>
       {STARTER_PROMPTS.map(({ title, description, prompt, Icon }) => (
         <button
           key={title}

@@ -9,7 +9,16 @@ const TEST_FILE_PATTERN = /\.(test|spec)\.[cm]?[jt]sx?$/;
 const PACKAGE_MANIFEST_PATTERN = /(^|\/)package\.json$/;
 const VITEST_CONFIG_PATTERN = /(^|\/)vitest\.config\.ts$/;
 const TEST_FILE_SUFFIXES = ["test", "spec"];
-const TEST_FILE_EXTENSIONS = ["ts", "tsx", "js", "jsx", "mts", "cts", "mjs", "cjs"];
+const TEST_FILE_EXTENSIONS = [
+  "ts",
+  "tsx",
+  "js",
+  "jsx",
+  "mts",
+  "cts",
+  "mjs",
+  "cjs",
+];
 
 const FULL_WORKSPACE_CHECK_FILES = new Set([
   "package.json",
@@ -91,7 +100,10 @@ if (prettierFiles.length > 0) {
 
 const workspacePackages = loadWorkspacePackages();
 const workspacePackageByName = new Map(
-  workspacePackages.map((workspacePackage) => [workspacePackage.name, workspacePackage]),
+  workspacePackages.map((workspacePackage) => [
+    workspacePackage.name,
+    workspacePackage,
+  ]),
 );
 const checkScope = getCheckScope(stagedFiles, workspacePackages);
 
@@ -196,7 +208,7 @@ function getCheckScope(files, workspacePackages) {
       continue;
     }
 
-    if (workspacePackage.name === "@dentaltrip-ai/typescript-config") {
+    if (workspacePackage.name === "@chatbot-experiments/typescript-config") {
       return { runFullChecks: true, packageNames: [] };
     }
 
@@ -339,7 +351,9 @@ function getFilesForWorkspacePackage(files, packageName, workspacePackages) {
 }
 
 function shouldRunFullPackageTests(file) {
-  return PACKAGE_MANIFEST_PATTERN.test(file) || VITEST_CONFIG_PATTERN.test(file);
+  return (
+    PACKAGE_MANIFEST_PATTERN.test(file) || VITEST_CONFIG_PATTERN.test(file)
+  );
 }
 
 function findTestFilesForPackageFiles(workspacePackage, packageFiles) {
@@ -392,21 +406,24 @@ function toPackageRelativePath(workspacePackage, file) {
 function findWorkspacePackage(file, workspacePackages) {
   return workspacePackages.find((workspacePackage) => {
     return (
-      file === workspacePackage.root || file.startsWith(`${workspacePackage.root}/`)
+      file === workspacePackage.root ||
+      file.startsWith(`${workspacePackage.root}/`)
     );
   });
 }
 
 function loadWorkspacePackages() {
-  const workspacePackageRoots = ["apps", "packages"].flatMap((workspaceRoot) => {
-    if (!existsSync(workspaceRoot)) {
-      return [];
-    }
+  const workspacePackageRoots = ["apps", "packages"].flatMap(
+    (workspaceRoot) => {
+      if (!existsSync(workspaceRoot)) {
+        return [];
+      }
 
-    return readdirSync(workspaceRoot, { withFileTypes: true })
-      .filter((entry) => entry.isDirectory())
-      .map((entry) => path.posix.join(workspaceRoot, entry.name));
-  });
+      return readdirSync(workspaceRoot, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => path.posix.join(workspaceRoot, entry.name));
+    },
+  );
 
   return workspacePackageRoots
     .map(loadWorkspacePackage)

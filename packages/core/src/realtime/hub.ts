@@ -1,4 +1,7 @@
-import type { RealtimeFrame, RealtimeScope } from "@dentaltrip-ai/protocol/realtime";
+import type {
+  RealtimeFrame,
+  RealtimeScope,
+} from "@chatbot-experiments/protocol/realtime";
 
 export type { RealtimeFrame, RealtimeScope };
 
@@ -26,7 +29,8 @@ export class RealtimeHub {
 
   register(scope: RealtimeScope, subscriber: RealtimeSubscriber): void {
     const key = scopeKey(scope);
-    const subscribers = this.subscribers.get(key) ?? new Set<RealtimeSubscriber>();
+    const subscribers =
+      this.subscribers.get(key) ?? new Set<RealtimeSubscriber>();
 
     subscribers.add(subscriber);
     this.subscribers.set(key, subscribers);

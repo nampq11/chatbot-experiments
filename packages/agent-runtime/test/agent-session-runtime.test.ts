@@ -1,12 +1,17 @@
-import type { Message as AgentMessage } from "@dentaltrip-ai/ai";
+import type { Message as AgentMessage } from "@chatbot-experiments/ai";
 import type {
   AgentRunRecord,
   AgentRunRequest,
   CreateAgentRunInput,
   UpdateAgentRunInput,
-} from "@dentaltrip-ai/core/agent";
-import type { DomainEvent } from "@dentaltrip-ai/core/events";
-import type { AppendSessionDataRepositoryInput, Message, Session, SessionDataEntry } from "@dentaltrip-ai/core/session";
+} from "@chatbot-experiments/core/agent";
+import type { DomainEvent } from "@chatbot-experiments/core/events";
+import type {
+  AppendSessionDataRepositoryInput,
+  Message,
+  Session,
+  SessionDataEntry,
+} from "@chatbot-experiments/core/session";
 import { describe, expect, it, vi } from "vitest";
 import { createAgentRuntime } from "../src/core/agent-session-runtime.ts";
 import { type CreateAgentFn, SessionActor } from "../src/core/session-actor.ts";
@@ -66,7 +71,9 @@ function createMemoryRepository() {
       sessionData.set(input.sessionId, dataList);
       return message;
     },
-    async appendSessionData(input: AppendSessionDataRepositoryInput): Promise<SessionDataEntry> {
+    async appendSessionData(
+      input: AppendSessionDataRepositoryInput,
+    ): Promise<SessionDataEntry> {
       const dataList = sessionData.get(input.sessionId) ?? [];
       const entry: SessionDataEntry = {
         id: input.id,
@@ -102,7 +109,10 @@ function createMemoryRepository() {
       runs.push(run);
       return run;
     },
-    async updateAgentRun(runId: string, input: UpdateAgentRunInput): Promise<void> {
+    async updateAgentRun(
+      runId: string,
+      input: UpdateAgentRunInput,
+    ): Promise<void> {
       const run = runs.find((candidate) => candidate.id === runId);
       if (!run) {
         return;
@@ -118,7 +128,10 @@ function createMemoryRepository() {
 
 type MemoryRepository = ReturnType<typeof createMemoryRepository>;
 
-function createActiveSession(sessionId: string, overrides: Partial<Session> = {}): Session {
+function createActiveSession(
+  sessionId: string,
+  overrides: Partial<Session> = {},
+): Session {
   return {
     id: sessionId,
     userId: DEFAULT_USER_ID,
@@ -150,7 +163,10 @@ async function appendRepositoryMessage(
   });
 }
 
-function createFakeAgent(initialMessages: AgentMessage[], options: { continueImpl?: () => Promise<void> | void } = {}) {
+function createFakeAgent(
+  initialMessages: AgentMessage[],
+  options: { continueImpl?: () => Promise<void> | void } = {},
+) {
   return {
     subscribe: vi.fn(() => () => {}),
     state: {
@@ -205,7 +221,9 @@ describe("createAgentRuntime", () => {
 
     expect(createAgent).toHaveBeenCalledTimes(1);
     expect(
-      agents[0]?.state.messages.filter((message) => message.role === "user").map((message) => message.content),
+      agents[0]?.state.messages
+        .filter((message) => message.role === "user")
+        .map((message) => message.content),
     ).toEqual(["first", "second"]);
   });
 
@@ -326,9 +344,15 @@ describe("createAgentRuntime", () => {
 
     expect(createAgent).toHaveBeenCalledTimes(1);
     const initialMessages = createAgent.mock.calls[0]?.[0].messages;
-    expect(initialMessages?.map((message) => message.role)).toEqual(["user", "assistant"]);
+    expect(initialMessages?.map((message) => message.role)).toEqual([
+      "user",
+      "assistant",
+    ]);
     expect(
-      initialMessages?.some((message) => message.role === "user" && message.content === "current user message"),
+      initialMessages?.some(
+        (message) =>
+          message.role === "user" && message.content === "current user message",
+      ),
     ).toBe(false);
   });
 
@@ -350,7 +374,9 @@ describe("createAgentRuntime", () => {
       content: "hello",
     });
     const onStreamEvent = vi.fn();
-    const sendMessage = vi.spyOn(SessionActor.prototype, "sendMessage").mockResolvedValue(undefined);
+    const sendMessage = vi
+      .spyOn(SessionActor.prototype, "sendMessage")
+      .mockResolvedValue(undefined);
 
     try {
       await runtime.startRun({

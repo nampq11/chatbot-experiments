@@ -28,6 +28,6 @@ export const CHAT_EMPTY_STATE_CANVAS_CLASS =
 export const CHAT_EMPTY_STATE_GREETING_ZONE_CLASS =
   "mx-auto flex min-h-20 w-full max-w-2xl items-end justify-center md:min-h-24";
 
-/** Display treatment for the empty-state greeting above the composer. */
+/** Visual treatment for the empty-state greeting above the composer. */
 export const CHAT_HERO_GREETING_CLASS =
   "mb-0 text-3xl font-light leading-10 tracking-[-0.03em] text-foreground/85 sm:text-[34px] sm:leading-[48px] md:whitespace-nowrap md:text-[36px] md:leading-[54px]";

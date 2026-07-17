@@ -13,7 +13,11 @@ interface SessionShowOptions {
 }
 
 /** Adds chat session management subcommands to the root CLI program. */
-export function addSessionCommands(program: Command, env: CliEnv, userId: string): void {
+export function addSessionCommands(
+  program: Command,
+  env: CliEnv,
+  userId: string,
+): void {
   const sessionsCmd = program
     .command("sessions")
     .description("Manage chat sessions")
@@ -37,7 +41,9 @@ export function addSessionCommands(program: Command, env: CliEnv, userId: string
 
         output.write(`\x1b[1m\x1b[36mSessions\x1b[0m\n\n`);
         if (sessions.items.length === 0) {
-          output.write("  No sessions found. Start a new session with \x1b[1mdentaltrip-ai\x1b[0m\n");
+          output.write(
+            "  No sessions found. Start a new session with \x1b[1mchatbot-experiments\x1b[0m\n",
+          );
           return;
         }
 
@@ -64,7 +70,9 @@ export function addSessionCommands(program: Command, env: CliEnv, userId: string
           sessionId: id,
           userId,
         });
-        const messages = options.messages ? await runtime.sessions.listMessages({ sessionId: id, userId }) : [];
+        const messages = options.messages
+          ? await runtime.sessions.listMessages({ sessionId: id, userId })
+          : [];
 
         if (options.json) {
           const sessionWithMessages = { ...session, messages };
@@ -75,8 +83,12 @@ export function addSessionCommands(program: Command, env: CliEnv, userId: string
         output.write(`\x1b[1m\x1b[36mSession Details\x1b[0m\n\n`);
         output.write(`  \x1b[1mID:\x1b[0m         ${session.id}\n`);
         output.write(`  \x1b[1mTitle:\x1b[0m       ${session.title}\n`);
-        output.write(`  \x1b[1mCreated:\x1b[0m     ${new Date(session.createdAt).toISOString()}\n`);
-        output.write(`  \x1b[1mUpdated:\x1b[0m     ${new Date(session.updatedAt).toISOString()}\n`);
+        output.write(
+          `  \x1b[1mCreated:\x1b[0m     ${new Date(session.createdAt).toISOString()}\n`,
+        );
+        output.write(
+          `  \x1b[1mUpdated:\x1b[0m     ${new Date(session.updatedAt).toISOString()}\n`,
+        );
         output.write(`  \x1b[1mStatus:\x1b[0m       ${session.status}\n`);
         output.write(`  \x1b[1mMessages:\x1b[0m    ${messages.length}\n\n`);
       } catch (_error) {

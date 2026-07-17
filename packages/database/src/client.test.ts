@@ -32,7 +32,9 @@ afterEach(() => {
 
 describe("createDatabaseClient", () => {
   it("creates a connection pool without running migrations", async () => {
-    const client = await createDatabaseClient("mysql://root:password@127.0.0.1:3307/dental_chat");
+    const client = await createDatabaseClient(
+      "mysql://root:password@127.0.0.1:3307/chatbot_experiments_test",
+    );
 
     expect(mocks.createPool).toHaveBeenCalledTimes(1);
     expect(mocks.drizzle).toHaveBeenCalled();

@@ -1,11 +1,23 @@
 import { randomUUID } from "node:crypto";
-import type { AgentRunRequest, AgentRunStore, AgentRuntime } from "@dentaltrip-ai/core/agent";
-import type { DomainEvent } from "@dentaltrip-ai/core/events";
-import type { Message } from "@dentaltrip-ai/core/session";
+import type {
+  AgentRunRequest,
+  AgentRunStore,
+  AgentRuntime,
+} from "@chatbot-experiments/core/agent";
+import type { DomainEvent } from "@chatbot-experiments/core/events";
+import type { Message } from "@chatbot-experiments/core/session";
 import { loadAzureOpenAIConfig } from "../azure-openai.ts";
-import { DENTALTRIP_SYSTEM_PROMPT } from "../system-prompt.ts";
-import { type AzureOpenAIConfigProvider, createAgent, resolveAgentModel, type ThinkingLevel } from "./agent.ts";
-import { type AgentSessionRepository, AgentSessionService } from "./agent-session-service.ts";
+import { CHATBOT_EXPERIMENTS_SYSTEM_PROMPT } from "../system-prompt.ts";
+import {
+  type AzureOpenAIConfigProvider,
+  createAgent,
+  resolveAgentModel,
+  type ThinkingLevel,
+} from "./agent.ts";
+import {
+  type AgentSessionRepository,
+  AgentSessionService,
+} from "./agent-session-service.ts";
 import { type CreateAgentFn, SessionActor } from "./session-actor.ts";
 
 /** Session transcript persistence required by the reusable agent runtime. */
@@ -38,7 +50,8 @@ export function createAgentRuntime({
   thinkingLevel = "medium",
 }: CreateAgentRuntimeOptions): AgentRuntimeController {
   const actors = new Map<string, SessionActor>();
-  const configurationValidator = validateConfiguration ?? azureOpenAIConfigProvider;
+  const configurationValidator =
+    validateConfiguration ?? azureOpenAIConfigProvider;
   const createRuntimeAgent: CreateAgentFn =
     createAgentFactory ??
     (({ sessionId, messages, systemPrompt, thinkingLevel }) =>
@@ -81,7 +94,7 @@ export function createAgentRuntime({
             userId: request.userId,
             model,
             initialMessages,
-            systemPrompt: DENTALTRIP_SYSTEM_PROMPT,
+            systemPrompt: CHATBOT_EXPERIMENTS_SYSTEM_PROMPT,
             transcriptWriter: transcriptRepository,
             agentRunStore,
             publishEvent,

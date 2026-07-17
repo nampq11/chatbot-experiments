@@ -1,6 +1,6 @@
 "use client";
 
-import { useChatStore } from "@dentaltrip-ai/client/chat";
+import { useChatStore } from "@chatbot-experiments/client/chat";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,7 +10,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@dentaltrip-ai/ui/components/ui/alert-dialog";
+} from "@chatbot-experiments/ui/components/ui/alert-dialog";
 import { useQueryClient } from "@tanstack/react-query";
 
 export function DeleteMessageDialog() {

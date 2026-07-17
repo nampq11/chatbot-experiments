@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { stdin as input, stdout as output } from "node:process";
 import { createInterface } from "node:readline/promises";
-import type { AgentStreamEvent } from "@dentaltrip-ai/core/agent";
+import type { AgentStreamEvent } from "@chatbot-experiments/core/agent";
 import type { CliDependencies } from "../../services/runtime.ts";
 
 type CliReadline = ReturnType<typeof createInterface>;
@@ -15,7 +15,9 @@ function writeInteractiveCommands(helpDescription: string): void {
 }
 
 function writeSessionIntro(sessionId: string): void {
-  output.write(`\x1b[1m\x1b[32m✓\x1b[0m Session \x1b[1m${sessionId}\x1b[0m\n\n`);
+  output.write(
+    `\x1b[1m\x1b[32m✓\x1b[0m Session \x1b[1m${sessionId}\x1b[0m\n\n`,
+  );
   output.write(`\x1b[1mCommands:\x1b[0m\n`);
   writeInteractiveCommands("Show available commands");
   output.write("\n");
@@ -34,10 +36,15 @@ function clearConversation(sessionId: string): void {
     output.write("\n".repeat(50));
   }
 
-  output.write(`\x1b[1m\x1b[32m✓\x1b[0m Conversation cleared. Session: \x1b[1m${sessionId}\x1b[0m\n\n`);
+  output.write(
+    `\x1b[1m\x1b[32m✓\x1b[0m Conversation cleared. Session: \x1b[1m${sessionId}\x1b[0m\n\n`,
+  );
 }
 
-function handleInteractiveCommand(command: string, sessionId: string): InteractiveCommandResult {
+function handleInteractiveCommand(
+  command: string,
+  sessionId: string,
+): InteractiveCommandResult {
   switch (command) {
     case "/quit":
       return "quit";
@@ -53,7 +60,11 @@ function handleInteractiveCommand(command: string, sessionId: string): Interacti
 }
 
 function isReadlineClosedError(error: unknown): boolean {
-  return error instanceof Error && "code" in error && error.code === "ERR_USE_AFTER_CLOSE";
+  return (
+    error instanceof Error &&
+    "code" in error &&
+    error.code === "ERR_USE_AFTER_CLOSE"
+  );
 }
 
 async function readPrompt(rl: CliReadline): Promise<string | undefined> {
@@ -113,13 +124,22 @@ function createCliStreamRenderer(): (event: AgentStreamEvent) => void {
 }
 
 /** Starts the interactive chat loop for a new or existing session. */
-export async function runCli(dependencies: CliDependencies, sessionId?: string): Promise<void> {
+export async function runCli(
+  dependencies: CliDependencies,
+  sessionId?: string,
+): Promise<void> {
   const { sessions, agent, userId, verbose, noInput } = dependencies;
 
   if (noInput) {
-    output.write("\x1b[1m\x1b[31mError:\x1b[0m Cannot run interactive mode in non-interactive context.\n");
-    output.write("\x1b[1mHint:\x1b[0m Run in an interactive terminal and omit --no-input.\n");
-    output.write("\nRun \x1b[1mdentaltrip-ai --help\x1b[0m for more information.\n");
+    output.write(
+      "\x1b[1m\x1b[31mError:\x1b[0m Cannot run interactive mode in non-interactive context.\n",
+    );
+    output.write(
+      "\x1b[1mHint:\x1b[0m Run in an interactive terminal and omit --no-input.\n",
+    );
+    output.write(
+      "\nRun \x1b[1mchatbot-experiments --help\x1b[0m for more information.\n",
+    );
     process.exit(1);
   }
 
@@ -197,7 +217,9 @@ export async function runCli(dependencies: CliDependencies, sessionId?: string):
       activeRun = runController;
 
       if (verbose) {
-        output.write(`\x1b[90m[DEBUG] Starting agent run for message ${message.id}\x1b[0m\n`);
+        output.write(
+          `\x1b[90m[DEBUG] Starting agent run for message ${message.id}\x1b[0m\n`,
+        );
       }
 
       const renderStreamEvent = createCliStreamRenderer();

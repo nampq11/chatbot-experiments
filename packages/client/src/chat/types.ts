@@ -3,7 +3,7 @@ export {
   type RealtimeScope,
   realtimeFrameSchema,
   realtimeScopeSchema,
-} from "@dentaltrip-ai/protocol/realtime";
+} from "@chatbot-experiments/protocol/realtime";
 export type {
   Message,
   MessageRole,
@@ -12,4 +12,4 @@ export type {
   PaginationParams,
   Session,
   SessionStatus,
-} from "@dentaltrip-ai/protocol/session";
+} from "@chatbot-experiments/protocol/session";

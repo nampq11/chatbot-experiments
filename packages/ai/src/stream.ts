@@ -10,7 +10,7 @@ import type {
   StreamResult,
   ToolCall,
   Usage,
-} from "@dentaltrip-ai/llm-core";
+} from "@chatbot-experiments/llm-core";
 import { getApiProvider } from "./api-registry.js";
 import { calculateCost } from "./costs.js";
 import { registerBuiltinProviders } from "./providers/register-builtins.js";

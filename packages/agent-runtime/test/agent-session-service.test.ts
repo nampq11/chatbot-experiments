@@ -1,4 +1,4 @@
-import type { Message as AgentMessage, Model } from "@dentaltrip-ai/ai";
+import type { Message as AgentMessage, Model } from "@chatbot-experiments/ai";
 import { describe, expect, it } from "vitest";
 import { ZERO_USAGE } from "../src/core/agent-session-service.ts";
 import { extractAgentMessageText } from "../src/core/transcript-mapper.ts";
@@ -23,7 +23,9 @@ const TEST_MODEL: Model = {
 
 describe("extractAgentMessageText", () => {
   it("extracts system message text", () => {
-    expect(extractAgentMessageText({ role: "system", content: "system prompt" })).toBe("system prompt");
+    expect(
+      extractAgentMessageText({ role: "system", content: "system prompt" }),
+    ).toBe("system prompt");
   });
 
   it("extracts plain user message text", () => {
