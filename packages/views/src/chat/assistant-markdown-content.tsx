@@ -1,7 +1,7 @@
 "use client";
 
-import { cn } from "@dentaltrip-ai/ui";
-import { MessageContent } from "@dentaltrip-ai/ui/components/ui/message";
+import { cn } from "@chatbot-experiments/ui";
+import { MessageContent } from "@chatbot-experiments/ui/components/ui/message";
 import { useEffect, useRef, useState } from "react";
 
 const ASSISTANT_STREAM_DRAIN_FALLBACK_MS = 240;

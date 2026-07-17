@@ -1,4 +1,4 @@
-import type { Message, Model } from "@dentaltrip-ai/ai";
+import type { Message, Model } from "@chatbot-experiments/ai";
 import { describe, expect, it } from "vitest";
 import {
   createAgent,
@@ -26,7 +26,9 @@ describe("agent runtime config", () => {
   });
 
   it("maps thinking level to reasoning stream options", () => {
-    expect(toReasoningStreamOptions({ maxTokens: 1024 }, "medium", true)).toEqual({
+    expect(
+      toReasoningStreamOptions({ maxTokens: 1024 }, "medium", true),
+    ).toEqual({
       maxTokens: 1024,
       reasoningEffort: "medium",
       reasoningSummary: "auto",
@@ -64,7 +66,10 @@ describe("agent runtime config", () => {
         role: "user",
         content: [
           { type: "text", text: "Review this image" },
-          { type: "text", text: "Image input is not supported by the configured model." },
+          {
+            type: "text",
+            text: "Image input is not supported by the configured model.",
+          },
         ],
         timestamp: 1,
       },

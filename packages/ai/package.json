@@ -1,5 +1,5 @@
 {
-  "name": "@dentaltrip-ai/ai",
+  "name": "@chatbot-experiments/ai",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -32,18 +32,18 @@
     }
   },
   "scripts": {
-    "build": "pnpm --filter @dentaltrip-ai/llm-core build && tsc -p tsconfig.json",
-    "check-types": "pnpm --filter @dentaltrip-ai/llm-core build && tsc --noEmit",
+    "build": "pnpm --filter @chatbot-experiments/llm-core build && tsc -p tsconfig.json",
+    "check-types": "pnpm --filter @chatbot-experiments/llm-core build && tsc --noEmit",
     "lint": "pnpm exec biome check --error-on-warnings .",
-    "test": "pnpm --filter @dentaltrip-ai/llm-core build && vitest run"
+    "test": "pnpm --filter @chatbot-experiments/llm-core build && vitest run"
   },
   "dependencies": {
-    "@dentaltrip-ai/llm-core": "workspace:*",
+    "@chatbot-experiments/llm-core": "workspace:*",
     "openai": "6.38.0",
     "partial-json": "0.1.7"
   },
   "devDependencies": {
-    "@dentaltrip-ai/typescript-config": "workspace:*",
+    "@chatbot-experiments/typescript-config": "workspace:*",
     "typescript": "5.9.2",
     "vitest": "^3.2.4"
   }

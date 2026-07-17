@@ -4,16 +4,16 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter @dentaltrip-ai/protocol build && next dev",
-    "build": "pnpm --filter @dentaltrip-ai/protocol build && next build",
+    "dev": "pnpm --filter @chatbot-experiments/protocol build && next dev",
+    "build": "pnpm --filter @chatbot-experiments/protocol build && next build",
     "start": "next start",
     "lint": "pnpm exec biome check --error-on-warnings .",
     "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {
-    "@dentaltrip-ai/client": "workspace:*",
-    "@dentaltrip-ai/ui": "workspace:*",
-    "@dentaltrip-ai/views": "workspace:*",
+    "@chatbot-experiments/client": "workspace:*",
+    "@chatbot-experiments/ui": "workspace:*",
+    "@chatbot-experiments/views": "workspace:*",
     "@tanstack/react-query": "^5",
     "next": "16.2.0",
     "react": "^19.2.0",
@@ -21,7 +21,7 @@
     "uuid": "^14.0.0"
   },
   "devDependencies": {
-    "@dentaltrip-ai/typescript-config": "workspace:*",
+    "@chatbot-experiments/typescript-config": "workspace:*",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^22.15.3",
     "@types/react": "19.2.2",

@@ -13,7 +13,9 @@ vi.mock("node:readline/promises", () => ({
   createInterface: vi.fn(() => rl),
 }));
 
-function captureStdout<T>(fn: () => Promise<T>): Promise<{ result: T; output: string }> {
+function captureStdout<T>(
+  fn: () => Promise<T>,
+): Promise<{ result: T; output: string }> {
   const writes: string[] = [];
   const originalWrite = process.stdout.write;
   process.stdout.write = ((chunk: string) => {
@@ -40,20 +42,28 @@ const env = {
   nodeEnv: "development" as const,
   host: "0.0.0.0",
   port: 8080,
-  databaseUrl: "mysql://root:pass@127.0.0.1:3307/dental_chat",
+  databaseUrl: "mysql://root:pass@127.0.0.1:3307/chatbot_experiments_test",
   corsOrigins: ["http://localhost:3000"],
   thinkingLevel: "medium" as const,
 };
 
 describe("runCli", () => {
   it("prints the resolved config and exits", async () => {
-    const { output } = await captureStdout(() => createCliProgram(env).parseAsync(["node", "dentaltrip-ai", "config"]));
+    const { output } = await captureStdout(() =>
+      createCliProgram(env).parseAsync([
+        "node",
+        "chatbot-experiments",
+        "config",
+      ]),
+    );
 
-    expect(output).toContain("DentalTrip AI Configuration");
+    expect(output).toContain("Chatbot Experiments Configuration");
     expect(output).toContain("NODE_ENV");
     expect(output).toContain("development");
     expect(output).toContain("DATABASE_URL");
-    expect(output).toContain("mysql://root:********@127.0.0.1:3307/dental_chat");
+    expect(output).toContain(
+      "mysql://root:********@127.0.0.1:3307/chatbot_experiments_test",
+    );
     expect(output).not.toContain("root:pass@");
   });
 

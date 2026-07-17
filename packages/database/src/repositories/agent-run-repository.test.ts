@@ -1,4 +1,4 @@
-import type { AgentRunRecord } from "@dentaltrip-ai/core/agent";
+import type { AgentRunRecord } from "@chatbot-experiments/core/agent";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DrizzleAgentRunRepository } from "./agent-run-repository.ts";
 
@@ -27,7 +27,9 @@ function createDb() {
   };
 
   return {
-    db: db as unknown as ConstructorParameters<typeof DrizzleAgentRunRepository>[0],
+    db: db as unknown as ConstructorParameters<
+      typeof DrizzleAgentRunRepository
+    >[0],
     state,
   };
 }

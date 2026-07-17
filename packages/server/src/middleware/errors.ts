@@ -1,4 +1,8 @@
-import { SessionForbiddenError, SessionInactiveError, SessionNotFoundError } from "@dentaltrip-ai/core/session";
+import {
+  SessionForbiddenError,
+  SessionInactiveError,
+  SessionNotFoundError,
+} from "@chatbot-experiments/core/session";
 import type { NextFunction, Request, Response } from "express";
 
 interface BodyParserError {
@@ -15,7 +19,12 @@ export function notFoundHandler(_req: Request, res: Response): void {
   res.status(404).json({ error: "not_found" });
 }
 
-export function jsonErrorHandler(error: unknown, _req: Request, res: Response, next: NextFunction): void {
+export function jsonErrorHandler(
+  error: unknown,
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
   if (error instanceof SyntaxError && "body" in error) {
     res.status(400).json({ error: "malformed_json" });
     return;
@@ -23,7 +32,9 @@ export function jsonErrorHandler(error: unknown, _req: Request, res: Response, n
 
   if (
     isBodyParserError(error) &&
-    (error.type === "entity.too.large" || error.status === 413 || error.statusCode === 413)
+    (error.type === "entity.too.large" ||
+      error.status === 413 ||
+      error.statusCode === 413)
   ) {
     res.status(413).json({ error: "payload_too_large" });
     return;
@@ -47,6 +58,11 @@ export function jsonErrorHandler(error: unknown, _req: Request, res: Response, n
   next(error);
 }
 
-export function internalErrorHandler(_error: unknown, _req: Request, res: Response, _next: NextFunction): void {
+export function internalErrorHandler(
+  _error: unknown,
+  _req: Request,
+  res: Response,
+  _next: NextFunction,
+): void {
   res.status(500).json({ error: "internal_error" });
 }

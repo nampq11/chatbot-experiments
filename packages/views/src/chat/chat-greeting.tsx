@@ -1,4 +1,4 @@
-import { cn } from "@dentaltrip-ai/ui";
+import { cn } from "@chatbot-experiments/ui";
 
 interface ChatGreetingProps {
   userName?: string;
@@ -12,7 +12,7 @@ export function ChatGreeting({
   hasMessages,
   className,
 }: ChatGreetingProps) {
-  if (hasMessages) return <h1 className="sr-only">DentalTrip AI Chat</h1>;
+  if (hasMessages) return <h1 className="sr-only">Chatbot Experiments Chat</h1>;
 
   return (
     <h1
@@ -28,7 +28,7 @@ export function ChatGreeting({
 
 function getGreetingText({ userName }: { userName?: string }): string {
   if (userName) {
-    return `Good to see you, ${userName}. Let’s plan your dental trip.`;
+    return `Good to see you, ${userName}. Let’s design your next chatbot experiment.`;
   }
-  return "Plan your dental trip to Vietnam";
+  return "Design your next chatbot experiment";
 }

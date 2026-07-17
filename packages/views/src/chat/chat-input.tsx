@@ -4,18 +4,18 @@ import {
   useAppendMessage,
   useChatStore,
   useCreateSessionWithMessage,
-} from "@dentaltrip-ai/client/chat";
-import { useIdentityStore } from "@dentaltrip-ai/client/identity";
+} from "@chatbot-experiments/client/chat";
+import { useIdentityStore } from "@chatbot-experiments/client/identity";
 import {
   getChatSessionPath,
   useNavigation,
-} from "@dentaltrip-ai/client/navigation";
-import { Button, cn } from "@dentaltrip-ai/ui";
+} from "@chatbot-experiments/client/navigation";
+import { Button, cn } from "@chatbot-experiments/ui";
 import {
   PromptInput,
   PromptInputActions,
   PromptInputTextarea,
-} from "@dentaltrip-ai/ui/components/ui/prompt-input";
+} from "@chatbot-experiments/ui/components/ui/prompt-input";
 import { ArrowUp } from "lucide-react";
 import { ChatFooterDisclaimer } from "./chat-footer-disclaimer";
 import { ChatGreeting } from "./chat-greeting";
@@ -147,7 +147,7 @@ export function ChatInput({
               name="message"
               autoComplete="off"
               enterKeyHint="send"
-              placeholder="Ask about costs, clinic fit, or travel timing…"
+              placeholder="Ask about prompts, models, or evaluations…"
               className="min-h-[44px] pt-3 pl-4 text-base leading-6 sm:text-base md:text-base"
             />
 

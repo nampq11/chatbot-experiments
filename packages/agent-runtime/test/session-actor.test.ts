@@ -1,17 +1,17 @@
-import type { Message as AgentMessage, Model } from "@dentaltrip-ai/ai";
+import type { Message as AgentMessage, Model } from "@chatbot-experiments/ai";
 import type {
   AgentRunRecord,
   AgentStreamEvent,
   CreateAgentRunInput,
   UpdateAgentRunInput,
-} from "@dentaltrip-ai/core/agent";
-import type { DomainEvent } from "@dentaltrip-ai/core/events";
+} from "@chatbot-experiments/core/agent";
+import type { DomainEvent } from "@chatbot-experiments/core/events";
 import type {
   AppendMessageRepositoryInput,
   AppendSessionDataRepositoryInput,
   Message,
   SessionDataEntry,
-} from "@dentaltrip-ai/core/session";
+} from "@chatbot-experiments/core/session";
 import { describe, expect, it, vi } from "vitest";
 import { ZERO_USAGE } from "../src/core/agent-session-service.ts";
 import { SessionActor } from "../src/core/session-actor.ts";
@@ -157,7 +157,9 @@ function createMemoryRepository() {
       });
       return message;
     },
-    async appendSessionData(input: AppendSessionDataRepositoryInput): Promise<SessionDataEntry> {
+    async appendSessionData(
+      input: AppendSessionDataRepositoryInput,
+    ): Promise<SessionDataEntry> {
       const entry: SessionDataEntry = {
         id: input.id,
         sessionId: input.sessionId,
@@ -194,7 +196,10 @@ function createMemoryRepository() {
       runs.push(run);
       return run;
     },
-    async updateAgentRun(runId: string, input: UpdateAgentRunInput): Promise<void> {
+    async updateAgentRun(
+      runId: string,
+      input: UpdateAgentRunInput,
+    ): Promise<void> {
       const run = runs.find((candidate) => candidate.id === runId);
       if (!run) {
         return;
@@ -248,7 +253,9 @@ describe("SessionActor", () => {
           });
         }
 
-        const assistantMessage = createAssistantMessage(`response-${callNumber}`);
+        const assistantMessage = createAssistantMessage(
+          `response-${callNumber}`,
+        );
         emit({ type: "message_end", message: assistantMessage });
         state.messages.push(assistantMessage);
       },
@@ -282,12 +289,20 @@ describe("SessionActor", () => {
     await Promise.all([firstRun, secondRun]);
 
     expect(agent.continue).toHaveBeenCalledTimes(2);
-    expect(repository.messages.map((message) => message.content)).toEqual(["response-1", "response-2"]);
+    expect(repository.messages.map((message) => message.content)).toEqual([
+      "response-1",
+      "response-2",
+    ]);
     expect(repository.runs).toMatchObject([
       { id: "run-1", messageId: "msg-1", status: "completed" },
       { id: "run-2", messageId: "msg-2", status: "completed" },
     ]);
-    expect(events.map((event) => event.type)).toEqual(["agent_start", "agent_end", "agent_start", "agent_end"]);
+    expect(events.map((event) => event.type)).toEqual([
+      "agent_start",
+      "agent_end",
+      "agent_start",
+      "agent_end",
+    ]);
   });
 
   it("emits assistant lifecycle around a text_start response without duplicate starts", async () => {
@@ -326,7 +341,12 @@ describe("SessionActor", () => {
       onStreamEvent: (event) => events.push(formatAgentStreamEvent(event)),
     });
 
-    expect(events).toEqual(["start", "delta:world", "assistant:world", "complete"]);
+    expect(events).toEqual([
+      "start",
+      "delta:world",
+      "assistant:world",
+      "complete",
+    ]);
   });
 
   it("emits assistant start before the first text_delta when text_start is skipped", async () => {
@@ -342,7 +362,13 @@ describe("SessionActor", () => {
       onStreamEvent: (event) => events.push(formatAgentStreamEvent(event)),
     });
 
-    expect(events).toEqual(["thinking:thinking", "start", "delta:world", "assistant:world", "complete"]);
+    expect(events).toEqual([
+      "thinking:thinking",
+      "start",
+      "delta:world",
+      "assistant:world",
+      "complete",
+    ]);
   });
 
   it("emits assistant start and completion around a final-only assistant message", async () => {
@@ -386,20 +412,30 @@ describe("SessionActor", () => {
       }),
     ).rejects.toThrow("database unavailable");
 
-    expect(events).toEqual(["thinking:thinking", "start", "delta:world", "assistant:world"]);
+    expect(events).toEqual([
+      "thinking:thinking",
+      "start",
+      "delta:world",
+      "assistant:world",
+    ]);
   });
 
   it("does not emit assistant completion for a failed assistant response", async () => {
     const repository = createMemoryRepository();
     const agent = createFakeAgent({
       continueImpl: ({ emit, state }) => {
-        const assistantMessage = createAssistantMessage("", "provider deployment missing");
+        const assistantMessage = createAssistantMessage(
+          "",
+          "provider deployment missing",
+        );
         emit({ type: "message_end", message: assistantMessage });
         state.messages.push(assistantMessage);
       },
     });
     const actor = createActor({ agent, repository });
-    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
     const streamEvents: AgentStreamEvent[] = [];
 
     try {
@@ -413,7 +449,9 @@ describe("SessionActor", () => {
         }),
       ).rejects.toThrow("provider deployment missing");
 
-      expect(streamEvents.some((event) => event.type === "message.completed")).toBe(false);
+      expect(
+        streamEvents.some((event) => event.type === "message.completed"),
+      ).toBe(false);
     } finally {
       consoleError.mockRestore();
     }
@@ -543,10 +581,17 @@ describe("SessionActor", () => {
       content: "hello",
       runId: "run-1",
       assistantMessageId: "assistant-message-1",
-      onStreamEvent: (event) => streamEvents.push(formatAgentStreamEvent(event)),
+      onStreamEvent: (event) =>
+        streamEvents.push(formatAgentStreamEvent(event)),
     });
 
-    expect(streamEvents).toEqual(["thinking:thinking", "start", "delta:world", "assistant:world", "complete"]);
+    expect(streamEvents).toEqual([
+      "thinking:thinking",
+      "start",
+      "delta:world",
+      "assistant:world",
+      "complete",
+    ]);
     expect(repository.messages).toHaveLength(1);
     expect(repository.messages[0]).toMatchObject({
       id: "assistant-message-1",
@@ -560,7 +605,10 @@ describe("SessionActor", () => {
       output: { messageCount: 2 },
       errorMessage: null,
     });
-    expect(events.map((event) => event.type)).toEqual(["agent_start", "agent_end"]);
+    expect(events.map((event) => event.type)).toEqual([
+      "agent_start",
+      "agent_end",
+    ]);
   });
 
   it("updates the run as failed when the assistant stream reports an error", async () => {
@@ -568,7 +616,10 @@ describe("SessionActor", () => {
     const events: DomainEvent[] = [];
     const agent = createFakeAgent({
       continueImpl: ({ emit, state }) => {
-        const assistantMessage = createAssistantMessage("", "provider deployment missing");
+        const assistantMessage = createAssistantMessage(
+          "",
+          "provider deployment missing",
+        );
         emit({ type: "message_end", message: assistantMessage });
         state.messages.push(assistantMessage);
       },
@@ -578,7 +629,9 @@ describe("SessionActor", () => {
       repository,
       publishEvent: (event) => events.push(event),
     });
-    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
     const streamEvents: string[] = [];
 
     try {
@@ -587,20 +640,25 @@ describe("SessionActor", () => {
           messageId: "msg-1",
           content: "hello",
           assistantMessageId: "assistant-message-1",
-          onStreamEvent: (event) => streamEvents.push(formatAgentStreamEvent(event)),
+          onStreamEvent: (event) =>
+            streamEvents.push(formatAgentStreamEvent(event)),
         }),
       ).rejects.toThrow("provider deployment missing");
 
       expect(consoleError).toHaveBeenCalledWith(
         "[agent] assistant stream error for session session-1: provider deployment missing",
       );
-      expect(streamEvents).toEqual(["assistant:Agent error: provider deployment missing"]);
+      expect(streamEvents).toEqual([
+        "assistant:Agent error: provider deployment missing",
+      ]);
       expect(repository.messages).toHaveLength(0);
       expect(repository.runs[0]).toMatchObject({
         status: "failed",
         errorMessage: "provider deployment missing",
       });
-      const runEvents = events.filter((event) => event.type === "agent_start" || event.type === "agent_end");
+      const runEvents = events.filter(
+        (event) => event.type === "agent_start" || event.type === "agent_end",
+      );
       expect(runEvents).toMatchObject([
         { type: "agent_start", sessionId: "session-1" },
         {
@@ -645,7 +703,10 @@ describe("SessionActor", () => {
       errorMessage: "Agent run was cancelled.",
     });
     expect(actor.getMessages()).toHaveLength(1);
-    expect(events.map((event) => event.type)).toEqual(["agent_start", "agent_end"]);
+    expect(events.map((event) => event.type)).toEqual([
+      "agent_start",
+      "agent_end",
+    ]);
   });
 
   it("updates the run as cancelled when an aborted signal stops the agent", async () => {
@@ -687,6 +748,9 @@ describe("SessionActor", () => {
       status: "cancelled",
       errorMessage: "aborted",
     });
-    expect(events.map((event) => event.type)).toEqual(["agent_start", "agent_end"]);
+    expect(events.map((event) => event.type)).toEqual([
+      "agent_start",
+      "agent_end",
+    ]);
   });
 });

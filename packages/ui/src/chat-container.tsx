@@ -29,7 +29,7 @@ export type ChatContainerAutoScrollProps = {
 const useIsomorphicLayoutEffect =
   typeof window === "undefined" ? useEffect : useLayoutEffect;
 const CHAT_CONTAINER_RESUME_FOLLOW_EVENT =
-  "dentaltrip-ai:chat-container-resume-follow";
+  "chatbot-experiments:chat-container-resume-follow";
 
 function ChatContainerRoot({
   children,

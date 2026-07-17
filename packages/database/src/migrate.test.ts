@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { MIGRATION_TABLES, resetDatabaseSchema, runMigrations } from "./migrate.ts";
+import {
+  MIGRATION_TABLES,
+  resetDatabaseSchema,
+  runMigrations,
+} from "./migrate.ts";
 
 const mocks = vi.hoisted(() => {
   const connectionEnd = vi.fn(async () => {});
@@ -45,7 +49,8 @@ afterEach(() => {
   mocks.migrate.mockReset();
 });
 
-const databaseUrl = "mysql://root:password@127.0.0.1:3307/dental_chat";
+const databaseUrl =
+  "mysql://root:password@127.0.0.1:3307/chatbot_experiments_test";
 
 describe("runMigrations", () => {
   it("applies pending migrations using a dedicated connection", async () => {
@@ -74,20 +79,47 @@ describe("resetDatabaseSchema", () => {
     await resetDatabaseSchema(databaseUrl);
 
     expect(mocks.createPool).toHaveBeenCalledTimes(1);
-    expect(mocks.poolQuery).toHaveBeenNthCalledWith(1, "SET FOREIGN_KEY_CHECKS = 0");
-    expect(mocks.poolQuery).toHaveBeenNthCalledWith(2, "DROP TABLE IF EXISTS `agent_runs`");
-    expect(mocks.poolQuery).toHaveBeenNthCalledWith(3, "DROP TABLE IF EXISTS `messages`");
-    expect(mocks.poolQuery).toHaveBeenNthCalledWith(4, "DROP TABLE IF EXISTS `sessions`");
-    expect(mocks.poolQuery).toHaveBeenNthCalledWith(5, "DROP TABLE IF EXISTS `users`");
-    expect(mocks.poolQuery).toHaveBeenNthCalledWith(6, "DROP TABLE IF EXISTS `__drizzle_migrations`");
-    expect(mocks.poolQuery).toHaveBeenNthCalledWith(7, "SET FOREIGN_KEY_CHECKS = 1");
+    expect(mocks.poolQuery).toHaveBeenNthCalledWith(
+      1,
+      "SET FOREIGN_KEY_CHECKS = 0",
+    );
+    expect(mocks.poolQuery).toHaveBeenNthCalledWith(
+      2,
+      "DROP TABLE IF EXISTS `agent_runs`",
+    );
+    expect(mocks.poolQuery).toHaveBeenNthCalledWith(
+      3,
+      "DROP TABLE IF EXISTS `messages`",
+    );
+    expect(mocks.poolQuery).toHaveBeenNthCalledWith(
+      4,
+      "DROP TABLE IF EXISTS `sessions`",
+    );
+    expect(mocks.poolQuery).toHaveBeenNthCalledWith(
+      5,
+      "DROP TABLE IF EXISTS `users`",
+    );
+    expect(mocks.poolQuery).toHaveBeenNthCalledWith(
+      6,
+      "DROP TABLE IF EXISTS `__drizzle_migrations`",
+    );
+    expect(mocks.poolQuery).toHaveBeenNthCalledWith(
+      7,
+      "SET FOREIGN_KEY_CHECKS = 1",
+    );
     expect(mocks.poolEnd).toHaveBeenCalledTimes(1);
   });
 });
 
 describe("MIGRATION_TABLES guard", () => {
   it("matches the managed table names", () => {
-    const expectedTables = ["users", "sessions", "messages", "agent_runs", "__drizzle_migrations"];
+    const expectedTables = [
+      "users",
+      "sessions",
+      "messages",
+      "agent_runs",
+      "__drizzle_migrations",
+    ];
 
     for (const table of expectedTables) {
       expect(MIGRATION_TABLES).toContain(table);

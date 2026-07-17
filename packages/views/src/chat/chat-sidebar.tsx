@@ -1,12 +1,12 @@
 "use client";
 
-import { useChatStore, useSessions } from "@dentaltrip-ai/client/chat";
+import { useChatStore, useSessions } from "@chatbot-experiments/client/chat";
 import {
   AppLink,
   getChatRootPath,
   getChatSessionPath,
-} from "@dentaltrip-ai/client/navigation";
-import { Button, cn, EmptyState, ErrorState } from "@dentaltrip-ai/ui";
+} from "@chatbot-experiments/client/navigation";
+import { Button, cn, EmptyState, ErrorState } from "@chatbot-experiments/ui";
 import {
   Sidebar,
   SidebarContent,
@@ -17,8 +17,9 @@ import {
   SidebarMenuItem,
   SidebarMenuSkeleton,
   useSidebar,
-} from "@dentaltrip-ai/ui/components/ui/sidebar";
+} from "@chatbot-experiments/ui/components/ui/sidebar";
 import {
+  Bot,
   ChevronDown,
   Loader2,
   PanelLeftIcon,
@@ -30,9 +31,12 @@ import React, { useEffect, useMemo, useRef } from "react";
 import { ChatSearchDialog } from "./chat-search-dialog";
 import { DeleteAllSessionsDialog } from "./delete-all-sessions-dialog";
 
-function DentalTripLogo({ collapsed = false }: { collapsed?: boolean }) {
+function ChatbotExperimentsLogo({
+  collapsed = false,
+}: {
+  collapsed?: boolean;
+}) {
   const iconSize = collapsed ? "size-[19px]" : "size-6";
-  const iconWidth = collapsed ? 19 : 24;
 
   return (
     <AppLink
@@ -46,28 +50,19 @@ function DentalTripLogo({ collapsed = false }: { collapsed?: boolean }) {
           : "flex h-9 min-w-0 items-center gap-2 rounded-lg px-2.5 hover:bg-sidebar-accent",
       )}
     >
-      <div className={`relative ${iconSize} shrink-0`}>
-        {/* biome-ignore lint/performance/noImgElement: Shared sidebar cannot import next/image; app-level image optimization is framework-specific. */}
-        <img
-          src="/logos/dentaltrip-ai-icon.svg"
-          alt="DentalTrip"
-          className={`imgLight absolute inset-0 ${iconSize} rounded-md`}
-          width={iconWidth}
-          height={iconWidth}
-        />
-        {/* biome-ignore lint/performance/noImgElement: Shared sidebar cannot import next/image; app-level image optimization is framework-specific. */}
-        <img
-          src="/logos/dentaltrip-ai-icon-dark.svg"
-          alt="DentalTrip"
-          className={`imgDark absolute inset-0 ${iconSize} rounded-md`}
-          width={iconWidth}
-          height={iconWidth}
-        />
-      </div>
+      <span
+        className={cn(
+          "inline-flex shrink-0 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground",
+          iconSize,
+        )}
+        aria-hidden="true"
+      >
+        <Bot className="size-[70%]" strokeWidth={2} />
+      </span>
 
       {!collapsed && (
         <span className="truncate text-sm font-semibold text-sidebar-foreground">
-          DentalTrip
+          Chatbot Experiments
         </span>
       )}
     </AppLink>
@@ -173,7 +168,7 @@ function ChatSidebarContent() {
       <div className="flex h-full w-full flex-col group-data-[collapsible=icon]:hidden">
         <SidebarHeader className="h-[52px] w-full px-3 py-0">
           <div className="flex h-full w-full items-center justify-between gap-2">
-            <DentalTripLogo />
+            <ChatbotExperimentsLogo />
 
             <Button
               variant="ghost"
@@ -397,7 +392,7 @@ function ChatSidebarContent() {
       {/* Collapsed sidebar */}
       <div className="hidden h-full flex-col items-center group-data-[collapsible=icon]:flex">
         <div className="flex w-full flex-col items-center gap-1 pt-3">
-          <DentalTripLogo collapsed />
+          <ChatbotExperimentsLogo collapsed />
 
           <CollapsedIconButton label="Expand sidebar" onClick={toggleSidebar}>
             <PanelLeftIcon

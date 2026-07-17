@@ -18,7 +18,7 @@ DB_HOST="${DB_HOST:-127.0.0.1}"
 DB_PORT="${DB_PORT:-3306}"
 DB_USER="${DB_USER:-root}"
 DB_PASSWORD="${DB_PASSWORD:-password}"
-DB_NAME="${DB_NAME:-dentaltrip}"
+DB_NAME="${DB_NAME:-chatbot_experiments}"
 DATABASE_URL="${DATABASE_URL:-}"
 
 export MYSQL_PWD="$DB_PASSWORD"
@@ -84,7 +84,7 @@ if is_local; then
   validate_db_name
 
   # ---------- Local: use Docker ----------
-  legacy_container="dentaltrip-ai-mysql-${db_port}"
+  legacy_container="chatbot-experiments-mysql-${db_port}"
 
   if docker inspect "$legacy_container" > /dev/null 2>&1; then
     echo "==> Removing legacy MySQL container '$legacy_container' to avoid docker-compose port conflicts..."

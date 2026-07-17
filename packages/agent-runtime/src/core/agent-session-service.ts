@@ -1,6 +1,14 @@
-import type { Message as AgentMessage, Model } from "@dentaltrip-ai/ai";
-import type { Message, Session, SessionRepository } from "@dentaltrip-ai/core/session";
-import { SessionForbiddenError, SessionInactiveError, SessionNotFoundError } from "@dentaltrip-ai/core/session";
+import type { Message as AgentMessage, Model } from "@chatbot-experiments/ai";
+import type {
+  Message,
+  Session,
+  SessionRepository,
+} from "@chatbot-experiments/core/session";
+import {
+  SessionForbiddenError,
+  SessionInactiveError,
+  SessionNotFoundError,
+} from "@chatbot-experiments/core/session";
 import { buildSessionContext } from "./session-manager.ts";
 
 /** Session persistence required by the reusable agent session runtime. */
@@ -69,7 +77,9 @@ export class AgentSessionService {
     await this.loadOwnedSession(input.sessionId, input.userId);
 
     const transcript = await this.repository.listMessages(input.sessionId);
-    const foundMessage = transcript.find((message) => message.id === input.messageId);
+    const foundMessage = transcript.find(
+      (message) => message.id === input.messageId,
+    );
 
     if (!foundMessage) {
       throw new SessionNotFoundError();
@@ -85,7 +95,9 @@ export class AgentSessionService {
    * Reads exclusively from session_data, the agent's rich log. The messages
    * table is a UI projection and is not consulted here.
    */
-  async buildInitialMessages(input: CreateAgentSessionInput): Promise<AgentMessage[]> {
+  async buildInitialMessages(
+    input: CreateAgentSessionInput,
+  ): Promise<AgentMessage[]> {
     const sessionData = await this.repository.listSessionData(input.sessionId);
     const initialSessionData = input.excludeMessageId
       ? sessionData.filter((entry) => entry.id !== input.excludeMessageId)

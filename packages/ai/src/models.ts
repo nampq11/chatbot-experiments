@@ -1,6 +1,6 @@
-import type { Api, Model } from "@dentaltrip-ai/llm-core";
+import type { Api, Model } from "@chatbot-experiments/llm-core";
 
-/** Minimal model registry owned by DentalTrip's server runtime. */
+/** Minimal model registry owned by Chatbot Experiments's server runtime. */
 export const models: Model<Api>[] = [
   {
     id: "gpt-5.4-nano",

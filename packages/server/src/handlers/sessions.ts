@@ -1,14 +1,22 @@
-import type { AppendMessageInput, MessageRecord, SessionUseCases } from "@dentaltrip-ai/core/session";
+import type {
+  AppendMessageInput,
+  MessageRecord,
+  SessionUseCases,
+} from "@chatbot-experiments/core/session";
 import {
   messageArraySchema,
   messageRoleSchema,
   messageSchema,
   paginatedSessionsResponseSchema,
   sessionSchema,
-} from "@dentaltrip-ai/protocol/session";
+} from "@chatbot-experiments/protocol/session";
 import { Router } from "express";
 import { z } from "zod";
-import { getAuthenticatedUserId, getSessionListLimit, parseRequestValue } from "../request-boundary.ts";
+import {
+  getAuthenticatedUserId,
+  getSessionListLimit,
+  parseRequestValue,
+} from "../request-boundary.ts";
 
 const sessionIdSchema = z.string().trim().min(1).max(36);
 const createSessionSchema = z.object({ title: z.string().min(1) });
@@ -40,7 +48,9 @@ export interface UserMessageAgentRunInput {
 }
 
 /** Starts assistant work for a persisted user message. */
-export type UserMessageAgentRunStarter = (input: UserMessageAgentRunInput) => void;
+export type UserMessageAgentRunStarter = (
+  input: UserMessageAgentRunInput,
+) => void;
 
 /** Dependencies required by the session and message HTTP routes. */
 export interface SessionRouterDependencies {
@@ -49,7 +59,10 @@ export interface SessionRouterDependencies {
 }
 
 /** Creates routes for session and message resources. */
-export function createSessionRouter({ sessions, startAgentRunForUserMessage }: SessionRouterDependencies): Router {
+export function createSessionRouter({
+  sessions,
+  startAgentRunForUserMessage,
+}: SessionRouterDependencies): Router {
   const router = Router();
 
   router.get("/sessions", async (req, res) => {
@@ -59,7 +72,8 @@ export function createSessionRouter({ sessions, startAgentRunForUserMessage }: S
       return;
     }
 
-    const cursor = typeof req.query.cursor === "string" ? req.query.cursor : undefined;
+    const cursor =
+      typeof req.query.cursor === "string" ? req.query.cursor : undefined;
     const limit = getSessionListLimit(req);
     const listedSessions = await sessions.listSessions({
       userId,

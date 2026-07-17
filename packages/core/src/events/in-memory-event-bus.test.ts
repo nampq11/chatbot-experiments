@@ -1,4 +1,4 @@
-import type { DomainEvent } from "@dentaltrip-ai/core/events";
+import type { DomainEvent } from "@chatbot-experiments/core/events";
 import { describe, expect, it, vi } from "vitest";
 import { createInMemoryEventBus } from "./in-memory-event-bus.ts";
 
@@ -65,7 +65,9 @@ describe("createInMemoryEventBus", () => {
 
     expect(laterListener).toHaveBeenCalledWith(messageAppendedEvent);
     await vi.waitFor(() => {
-      expect(reportedFailures).toEqual([{ type: "message.appended", message: "async listener failed" }]);
+      expect(reportedFailures).toEqual([
+        { type: "message.appended", message: "async listener failed" },
+      ]);
     });
   });
 

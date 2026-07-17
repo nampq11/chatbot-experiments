@@ -1,4 +1,4 @@
-import type { Usage } from "@dentaltrip-ai/ai";
+import type { Usage } from "@chatbot-experiments/ai";
 
 /** Zero token usage used when hydrating persisted messages without provider usage data. */
 export const ZERO_USAGE: Usage = {

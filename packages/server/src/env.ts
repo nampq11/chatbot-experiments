@@ -1,10 +1,13 @@
 import { z } from "zod";
 import { loadConfig } from "./config.ts";
 
-const DEFAULT_CORS_ORIGIN = "/^http:\\/\\/localhost:\\d+$/,/^https?:\\/\\/([a-z0-9-]+\\.)*dentaltrip\\.io$/";
+const DEFAULT_CORS_ORIGIN =
+  "/^http:\\/\\/localhost:\\d+$/,/^https?:\\/\\/([a-z0-9-]+\\.)*chatbot-experiments\\.local$/";
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  NODE_ENV: z
+    .enum(["development", "test", "production"])
+    .default("development"),
   HOST: z.string().default("0.0.0.0"),
   PORT: z.coerce.number().int().positive().default(8080),
   DATABASE_URL: z.string().min(1),

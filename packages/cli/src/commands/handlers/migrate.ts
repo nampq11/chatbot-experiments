@@ -1,5 +1,9 @@
 import { stderr } from "node:process";
-import { MIGRATION_TABLES, resetDatabaseSchema, runMigrations } from "@dentaltrip-ai/database";
+import {
+  MIGRATION_TABLES,
+  resetDatabaseSchema,
+  runMigrations,
+} from "@chatbot-experiments/database";
 import { Command } from "commander";
 
 export { MIGRATION_TABLES };
@@ -16,7 +20,9 @@ export async function runMigrateDown(databaseUrl: string): Promise<void> {
       stderr.write(`Failed to drop table ${table}: ${error}\n`);
     },
     onForeignKeyReenableError: (error) => {
-      stderr.write(`Warning: Failed to re-enable foreign key checks: ${error}\n`);
+      stderr.write(
+        `Warning: Failed to re-enable foreign key checks: ${error}\n`,
+      );
     },
   });
 }
@@ -26,11 +32,17 @@ export function createMigrateProgram(databaseUrl: string): Command {
   const program = new Command();
 
   program
-    .name("dentaltrip-ai migrate")
+    .name("chatbot-experiments migrate")
     .description("Apply or reset the local MySQL schema used by the server")
     .helpOption("-h, --help", "Display help for command")
-    .addHelpText("beforeAll", `\x1b[1m\x1b[36mDentalTrip AI Migrations\x1b[0m\n\n`)
-    .addHelpText("after", `\n\x1b[1mUsage:\x1b[0m\n  dentaltrip-ai migrate up\n  dentaltrip-ai migrate down\n`);
+    .addHelpText(
+      "beforeAll",
+      `\x1b[1m\x1b[36mChatbot Experiments Migrations\x1b[0m\n\n`,
+    )
+    .addHelpText(
+      "after",
+      `\n\x1b[1mUsage:\x1b[0m\n  chatbot-experiments migrate up\n  chatbot-experiments migrate down\n`,
+    );
 
   program
     .command("up")

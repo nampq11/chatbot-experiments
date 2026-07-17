@@ -46,7 +46,7 @@ if [ ! -f packages/server/.env ]; then
   cat > packages/server/.env << EOF
 HOST=${HOST:-0.0.0.0}
 PORT=${PORT:-8080}
-DATABASE_URL=${DATABASE_URL:-mysql://root:password@127.0.0.1:3306/dentaltrip}
+DATABASE_URL=${DATABASE_URL:-mysql://root:password@127.0.0.1:3306/chatbot_experiments}
 EOF
 fi
 
@@ -67,6 +67,6 @@ echo "  Frontend: http://localhost:${FRONTEND_PORT:-3000}"
 echo ""
 
 trap 'kill 0' EXIT
-pnpm --filter @dentaltrip-ai/server dev &
+pnpm --filter @chatbot-experiments/server dev &
 pnpm --filter web dev &
 wait

@@ -16,8 +16,8 @@ DB_HOST ?= 127.0.0.1
 DB_PORT ?= 3306
 DB_USER ?= root
 DB_PASSWORD ?= password
-DB_NAME ?= dentaltrip
-LEGACY_MYSQL_CONTAINER ?= dentaltrip-ai-mysql-$(DB_PORT)
+DB_NAME ?= chatbot_experiments
+LEGACY_MYSQL_CONTAINER ?= chatbot-experiments-mysql-$(DB_PORT)
 MYSQL_IMAGE ?= mysql:8.0
 DATABASE_URL ?= mysql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)
 DOCKER_COMPOSE ?= docker compose
@@ -41,7 +41,7 @@ help:
 	  '  make stop        Stop server + web processes started by this checkout' \
 	  '  make server      Run the Express server only' \
 	  '  make build       Build server and CLI packages' \
-	  '  make cli         Run the DentalTrip AI CLI REPL' \
+	  '  make cli         Run the Chatbot Experiments CLI REPL' \
 	  '  make docs        Build documentation site (Zensical)' \
 	  '  make check-docs  Validate documentation site (Zensical)' \
 	  '  make serve-docs  Serve documentation locally (Zensical)' \
@@ -74,7 +74,7 @@ setup: install ensure-env db-up
 
 dev: setup
 	@trap 'kill "$$server_pid" "$${web_pid:-}" >/dev/null 2>&1 || true' INT TERM EXIT; \
-	  DATABASE_URL='$(DATABASE_URL)' HOST='$(HOST)' PORT='$(PORT)' $(PNPM) --filter @dentaltrip-ai/server dev & \
+	  DATABASE_URL='$(DATABASE_URL)' HOST='$(HOST)' PORT='$(PORT)' $(PNPM) --filter @chatbot-experiments/server dev & \
 	  server_pid=$$!; \
 	  for _ in {1..120}; do \
 	    if curl -fsS '$(SERVER_HEALTH_URL)' >/dev/null 2>&1; then break; fi; \
@@ -89,7 +89,7 @@ dev: setup
 
 start: ensure-env db-up
 	@trap 'kill "$$server_pid" "$${web_pid:-}" >/dev/null 2>&1 || true' INT TERM EXIT; \
-	  DATABASE_URL='$(DATABASE_URL)' HOST='$(HOST)' PORT='$(PORT)' $(PNPM) --filter @dentaltrip-ai/server dev & \
+	  DATABASE_URL='$(DATABASE_URL)' HOST='$(HOST)' PORT='$(PORT)' $(PNPM) --filter @chatbot-experiments/server dev & \
 	  server_pid=$$!; \
 	  for _ in {1..120}; do \
 	    if curl -fsS '$(SERVER_HEALTH_URL)' >/dev/null 2>&1; then break; fi; \
@@ -105,18 +105,18 @@ start: ensure-env db-up
 stop:
 	@pkill -f "[t]sx.*src/main.ts" >/dev/null 2>&1 || true
 	@pkill -f "[t]sx.*cmd/server/main.ts" >/dev/null 2>&1 || true
-	@pkill -f "[p]npm --filter @dentaltrip-ai/server dev" >/dev/null 2>&1 || true
+	@pkill -f "[p]npm --filter @chatbot-experiments/server dev" >/dev/null 2>&1 || true
 	@pkill -f "[n]ode .*next/dist/bin/next dev --port $(WEB_PORT)" >/dev/null 2>&1 || true
 
 server: ensure-env db-up
-	@DATABASE_URL='$(DATABASE_URL)' HOST='$(HOST)' PORT='$(PORT)' $(PNPM) --filter @dentaltrip-ai/server dev
+	@DATABASE_URL='$(DATABASE_URL)' HOST='$(HOST)' PORT='$(PORT)' $(PNPM) --filter @chatbot-experiments/server dev
 
 build:
-	@$(PNPM) --filter @dentaltrip-ai/server build
-	@$(PNPM) --filter @dentaltrip-ai/cli build
+	@$(PNPM) --filter @chatbot-experiments/server build
+	@$(PNPM) --filter @chatbot-experiments/cli build
 
 cli:
-	@DATABASE_URL='$(DATABASE_URL)' $(PNPM) --filter @dentaltrip-ai/cli cli $(ARGS)
+	@DATABASE_URL='$(DATABASE_URL)' $(PNPM) --filter @chatbot-experiments/cli cli $(ARGS)
 
 docs: check-docs
 	@touch site/.nojekyll
@@ -143,7 +143,7 @@ migrate-gen:
 	@cd packages/server && $(PNPM) dlx drizzle-kit@0.31.10 generate --config drizzle.config.ts
 
 migrate-up:
-	@DATABASE_URL='$(DATABASE_URL)' $(PNPM) --filter @dentaltrip-ai/cli migrate up
+	@DATABASE_URL='$(DATABASE_URL)' $(PNPM) --filter @chatbot-experiments/cli migrate up
 
 migrate-down:
-	@DATABASE_URL='$(DATABASE_URL)' $(PNPM) --filter @dentaltrip-ai/cli migrate down
+	@DATABASE_URL='$(DATABASE_URL)' $(PNPM) --filter @chatbot-experiments/cli migrate down

@@ -1,5 +1,5 @@
 {
-  "extends": "@dentaltrip-ai/typescript-config/react-library.json",
+  "extends": "@chatbot-experiments/typescript-config/react-library.json",
   "compilerOptions": {
     "outDir": "dist",
     "strictNullChecks": true,

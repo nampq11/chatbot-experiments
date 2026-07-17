@@ -1,18 +1,18 @@
 "use client";
 
-import type { Session } from "@dentaltrip-ai/client/chat";
+import type { Session } from "@chatbot-experiments/client/chat";
 import {
   AppLink,
   getChatRootPath,
   getChatSessionPath,
-} from "@dentaltrip-ai/client/navigation";
-import { cn } from "@dentaltrip-ai/ui";
+} from "@chatbot-experiments/client/navigation";
+import { cn } from "@chatbot-experiments/ui";
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogTitle,
-} from "@dentaltrip-ai/ui/components/ui/dialog";
+} from "@chatbot-experiments/ui/components/ui/dialog";
 import { MessageSquare, Search, SquarePen, X } from "lucide-react";
 import * as React from "react";
 

@@ -21,8 +21,8 @@ const rules = [
       },
       {
         pattern:
-          /^@dentaltrip-ai\/(server|ai|agent-core|core|client|views|ui)($|\/)/,
-        rule: "packages/llm-core must not import higher-level DentalTrip packages.",
+          /^@chatbot-experiments\/(server|ai|agent-core|core|client|views|ui)($|\/)/,
+        rule: "packages/llm-core must not import higher-level Chatbot Experiments packages.",
       },
     ],
     forbiddenPatterns: [
@@ -37,7 +37,7 @@ const rules = [
     root: "packages/ai",
     forbiddenImports: [
       {
-        pattern: /^@dentaltrip-ai\/(server|core|client|views|ui)($|\/)/,
+        pattern: /^@chatbot-experiments\/(server|core|client|views|ui)($|\/)/,
         rule: "packages/ai must not import server, frontend, or UI packages.",
       },
     ],
@@ -57,7 +57,8 @@ const rules = [
         rule: "packages/agent-core must not import provider SDKs; providers belong in packages/ai.",
       },
       {
-        pattern: /^@dentaltrip-ai\/(server|ai|core|client|views|ui)($|\/)/,
+        pattern:
+          /^@chatbot-experiments\/(server|ai|core|client|views|ui)($|\/)/,
         rule: "packages/agent-core must not import server, provider, frontend, or UI packages.",
       },
     ],
@@ -73,7 +74,7 @@ const rules = [
     root: "packages/agent-runtime",
     forbiddenImports: [
       {
-        pattern: /^@dentaltrip-ai\/(server|cli|client|views|ui)($|\/)/,
+        pattern: /^@chatbot-experiments\/(server|cli|client|views|ui)($|\/)/,
         rule: "packages/agent-runtime must not import server, CLI, frontend, or UI packages.",
       },
       {
@@ -91,7 +92,8 @@ const rules = [
     root: "packages/core",
     forbiddenImports: [
       {
-        pattern: /^@dentaltrip-ai\/(server|client|database|views|ui)($|\/)/,
+        pattern:
+          /^@chatbot-experiments\/(server|client|database|views|ui)($|\/)/,
         rule: "packages/core must not import app, frontend, UI, server, or database packages.",
       },
       {
@@ -120,7 +122,7 @@ const rules = [
     root: "packages/database",
     forbiddenImports: [
       {
-        pattern: /^@dentaltrip-ai\/(server|cli|client|views|ui)($|\/)/,
+        pattern: /^@chatbot-experiments\/(server|cli|client|views|ui)($|\/)/,
         rule: "packages/database must not import server, CLI, frontend, or UI packages.",
       },
       {
@@ -139,7 +141,7 @@ const rules = [
     root: "packages/server",
     forbiddenImports: [
       {
-        pattern: /^@dentaltrip-ai\/cli($|\/)/,
+        pattern: /^@chatbot-experiments\/cli($|\/)/,
         rule: "packages/server must not import the CLI package.",
       },
       {
@@ -153,7 +155,7 @@ const rules = [
     root: "packages/cli",
     forbiddenImports: [
       {
-        pattern: /^@dentaltrip-ai\/server($|\/)/,
+        pattern: /^@chatbot-experiments\/server($|\/)/,
         rule: "packages/cli must not import the server package; use core, database, and runtime packages instead.",
       },
       {
@@ -172,7 +174,7 @@ const rules = [
       },
       {
         pattern: /^react-router-dom$/,
-        rule: "packages/views must not import react-router-dom; use NavigationAdapter from @dentaltrip-ai/client/navigation instead.",
+        rule: "packages/views must not import react-router-dom; use NavigationAdapter from @chatbot-experiments/client/navigation instead.",
       },
     ],
   },
@@ -219,8 +221,8 @@ const rules = [
     root: "packages/ui",
     forbiddenImports: [
       {
-        pattern: /^@dentaltrip-ai\/client($|\/)/,
-        rule: "packages/ui must not import @dentaltrip-ai/client; keep UI components free of business logic.",
+        pattern: /^@chatbot-experiments\/client($|\/)/,
+        rule: "packages/ui must not import @chatbot-experiments/client; keep UI components free of business logic.",
       },
     ],
   },

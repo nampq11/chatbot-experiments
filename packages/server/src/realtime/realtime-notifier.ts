@@ -1,10 +1,10 @@
-import type { DomainEvent, EventBus } from "@dentaltrip-ai/core/events";
+import type { DomainEvent, EventBus } from "@chatbot-experiments/core/events";
 import {
   type RealtimeFrame,
   RealtimeHub,
   type RealtimeScope,
   type RealtimeSubscriber,
-} from "@dentaltrip-ai/core/realtime";
+} from "@chatbot-experiments/core/realtime";
 
 const REALTIME_DOMAIN_EVENT_TYPES = [
   "session.created",
@@ -17,7 +17,10 @@ const REALTIME_DOMAIN_EVENT_TYPES = [
 type RealtimeDomainEventType = (typeof REALTIME_DOMAIN_EVENT_TYPES)[number];
 
 /** Domain events that the realtime layer projects to connected clients. */
-export type RealtimeDomainEvent = Extract<DomainEvent, { type: RealtimeDomainEventType }>;
+export type RealtimeDomainEvent = Extract<
+  DomainEvent,
+  { type: RealtimeDomainEventType }
+>;
 type SessionRealtimeFrame = Extract<RealtimeFrame, { sessionId: string }>;
 
 /** Options for wiring realtime notifications to an existing subscriber hub. */
@@ -115,7 +118,10 @@ export function mapEventToFrame(event: RealtimeDomainEvent): RealtimeFrame {
         };
       }
 
-      const type = event.status === "cancelled" ? "agent.run.cancelled" : "agent.run.completed";
+      const type =
+        event.status === "cancelled"
+          ? "agent.run.cancelled"
+          : "agent.run.completed";
 
       return {
         type,
@@ -127,7 +133,9 @@ export function mapEventToFrame(event: RealtimeDomainEvent): RealtimeFrame {
 }
 
 /** Resolves the subscriber scopes that should receive a realtime domain event. */
-export function resolveScopes(event: RealtimeDomainEvent): ReadonlyArray<RealtimeScope> {
+export function resolveScopes(
+  event: RealtimeDomainEvent,
+): ReadonlyArray<RealtimeScope> {
   switch (event.type) {
     case "session.created":
       return [{ type: "user", id: event.userId }];

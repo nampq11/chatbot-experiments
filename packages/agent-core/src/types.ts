@@ -12,7 +12,7 @@ import type {
   Tool,
   Transport,
   TSchema,
-} from "@dentaltrip-ai/llm-core";
+} from "@chatbot-experiments/llm-core";
 
 /** Function used by the agent loop to stream a provider response. */
 export type StreamFn = (
@@ -46,7 +46,9 @@ export interface AfterToolCallContext {
 }
 
 /** Hook result after a tool call executes. */
-export type AfterToolCallResult = { action: "continue" } | { action: "replace"; result: string };
+export type AfterToolCallResult =
+  | { action: "continue" }
+  | { action: "replace"; result: string };
 
 /** Model, tool, or prompt update applied before the next turn. */
 export interface AgentLoopTurnUpdate {
@@ -83,13 +85,29 @@ export interface AgentLoopConfig {
   transport?: Transport;
   maxRetryDelayMs?: number;
   toolExecution: ToolExecutionMode;
-  beforeStage?: (stage: BreakpointStage, context: AgentContext) => Promise<void> | void;
-  beforeToolCall?: (context: BeforeToolCallContext, signal?: AbortSignal) => Promise<BeforeToolCallResult | undefined>;
-  afterToolCall?: (context: AfterToolCallContext, signal?: AbortSignal) => Promise<AfterToolCallResult | undefined>;
-  prepareNextTurn?: (signal?: AbortSignal) => Promise<AgentLoopTurnUpdate | undefined>;
+  beforeStage?: (
+    stage: BreakpointStage,
+    context: AgentContext,
+  ) => Promise<void> | void;
+  beforeToolCall?: (
+    context: BeforeToolCallContext,
+    signal?: AbortSignal,
+  ) => Promise<BeforeToolCallResult | undefined>;
+  afterToolCall?: (
+    context: AfterToolCallContext,
+    signal?: AbortSignal,
+  ) => Promise<AfterToolCallResult | undefined>;
+  prepareNextTurn?: (
+    signal?: AbortSignal,
+  ) => Promise<AgentLoopTurnUpdate | undefined>;
   convertToLlm: (messages: AgentMessage[]) => Message[] | Promise<Message[]>;
-  transformContext?: (messages: AgentMessage[], signal?: AbortSignal) => Promise<AgentMessage[]>;
-  getApiKey?: (provider: string) => Promise<string | undefined> | string | undefined;
+  transformContext?: (
+    messages: AgentMessage[],
+    signal?: AbortSignal,
+  ) => Promise<AgentMessage[]>;
+  getApiKey?: (
+    provider: string,
+  ) => Promise<string | undefined> | string | undefined;
   getSteeringMessages: () => Promise<AgentMessage[]>;
   getFollowUpMessages: () => Promise<AgentMessage[]>;
 }
@@ -104,7 +122,9 @@ export interface AgentToolResult {
 export type AgentToolUpdateCallback = (update: string) => void;
 
 /** Tool definition used by the agent runtime. */
-export interface AgentTool<TParameters extends TSchema = TSchema> extends Tool<TParameters> {
+export interface AgentTool<
+  TParameters extends TSchema = TSchema,
+> extends Tool<TParameters> {
   label: string;
   prepareArguments?: (args: unknown) => Static<TParameters>;
   execute: (
@@ -170,7 +190,12 @@ export type AgentEvent =
       args: Record<string, unknown>;
       update: string;
     }
-  | { type: "tool_execution_end"; toolCallId: string; toolName: string; isError: boolean };
+  | {
+      type: "tool_execution_end";
+      toolCallId: string;
+      toolName: string;
+      isError: boolean;
+    };
 
 /** Queue behavior for steering and follow-up messages. */
 export type QueueMode = "all" | "one-at-a-time";

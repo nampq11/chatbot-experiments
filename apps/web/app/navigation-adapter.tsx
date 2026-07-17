@@ -4,12 +4,16 @@ import {
   type NavigationAdapter,
   type NavigationLinkComponent,
   NavigationProvider,
-} from "@dentaltrip-ai/client/navigation";
+} from "@chatbot-experiments/client/navigation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 /** Renders shared AppLink instances with Next.js client-side navigation. */
-const NextNavigationLink: NavigationLinkComponent = ({ to, children, ...props }) => {
+const NextNavigationLink: NavigationLinkComponent = ({
+  to,
+  children,
+  ...props
+}) => {
   return (
     <Link href={to} {...props}>
       {children}
@@ -17,7 +21,11 @@ const NextNavigationLink: NavigationLinkComponent = ({ to, children, ...props })
   );
 };
 
-export function WebNavigationProvider({ children }: { children: React.ReactNode }) {
+export function WebNavigationProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
 
   const adapter: NavigationAdapter = {

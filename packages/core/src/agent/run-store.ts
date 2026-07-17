@@ -1,4 +1,7 @@
-import type { AgentRun, AgentRunStatus } from "@dentaltrip-ai/protocol/agent-run";
+import type {
+  AgentRun,
+  AgentRunStatus,
+} from "@chatbot-experiments/protocol/agent-run";
 
 /** Lifecycle status persisted for an agent run. */
 export type { AgentRunStatus };

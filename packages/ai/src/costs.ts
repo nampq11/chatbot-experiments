@@ -1,4 +1,4 @@
-import type { Api, Model, Usage } from "@dentaltrip-ai/llm-core";
+import type { Api, Model, Usage } from "@chatbot-experiments/llm-core";
 
 /** Calculates provider cost in USD from token usage and model pricing. */
 export function calculateCost(usage: Usage, model: Model<Api>): Usage["cost"] {

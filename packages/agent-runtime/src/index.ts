@@ -7,7 +7,7 @@ export {
   type AgentResourceDiagnostics,
   getAgentResourceDiagnostics,
 } from "./resources.ts";
-export { DENTALTRIP_SYSTEM_PROMPT } from "./system-prompt.ts";
+export { CHATBOT_EXPERIMENTS_SYSTEM_PROMPT } from "./system-prompt.ts";
 export {
   type AgentTool,
   type AgentToolContext,

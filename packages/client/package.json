@@ -1,5 +1,5 @@
 {
-  "name": "@dentaltrip-ai/client",
+  "name": "@chatbot-experiments/client",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -12,11 +12,11 @@
   },
   "scripts": {
     "lint": "pnpm exec biome check --error-on-warnings .",
-    "test": "pnpm --filter @dentaltrip-ai/protocol build && vitest run",
+    "test": "pnpm --filter @chatbot-experiments/protocol build && vitest run",
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
-    "@dentaltrip-ai/typescript-config": "workspace:*",
+    "@chatbot-experiments/typescript-config": "workspace:*",
     "@types/node": "^22.15.3",
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
@@ -24,7 +24,7 @@
     "vitest": "^3"
   },
   "dependencies": {
-    "@dentaltrip-ai/protocol": "workspace:*",
+    "@chatbot-experiments/protocol": "workspace:*",
     "@tanstack/react-query": "^5",
     "react": "^19.2.0",
     "zod": "^4.4.3",

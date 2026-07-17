@@ -9,8 +9,12 @@ import type {
   ToolResultMessage,
   Usage,
   UserMessage,
-} from "@dentaltrip-ai/ai";
-import type { SessionDataEntry, SessionDataEntryType, SessionRepository } from "@dentaltrip-ai/core/session";
+} from "@chatbot-experiments/ai";
+import type {
+  SessionDataEntry,
+  SessionDataEntryType,
+  SessionRepository,
+} from "@chatbot-experiments/core/session";
 import { ZERO_USAGE } from "./usage.ts";
 
 /**
@@ -26,7 +30,10 @@ import { ZERO_USAGE } from "./usage.ts";
  */
 
 /** Persistence required by the append-only session manager. */
-export type SessionManagerRepository = Pick<SessionRepository, "appendSessionData" | "listSessionData">;
+export type SessionManagerRepository = Pick<
+  SessionRepository,
+  "appendSessionData" | "listSessionData"
+>;
 
 /** Entry categories that represent durable session history instead of pointers. */
 export type SessionHistoryEntryType = Exclude<SessionDataEntryType, "leaf">;
@@ -129,7 +136,8 @@ export class SessionManager {
   constructor(options: SessionManagerOptions) {
     this.repository = options.repository;
     this.generateId = options.generateId ?? randomUUID;
-    this.compactionSummaryPrefix = options.compactionSummaryPrefix ?? DEFAULT_COMPACTION_SUMMARY_PREFIX;
+    this.compactionSummaryPrefix =
+      options.compactionSummaryPrefix ?? DEFAULT_COMPACTION_SUMMARY_PREFIX;
   }
 
   /** Appends one history entry as a child of the current leaf and advances the leaf pointer. */
@@ -156,7 +164,9 @@ export class SessionManager {
   }
 
   /** Appends one agent message as a session message entry. */
-  async appendMessage(input: AppendSessionMessageInput): Promise<SessionDataEntry> {
+  async appendMessage(
+    input: AppendSessionMessageInput,
+  ): Promise<SessionDataEntry> {
     return this.appendEntry({
       id: input.id,
       sessionId: input.sessionId,
@@ -175,7 +185,9 @@ export class SessionManager {
   /** Sets the current leaf pointer to an existing history entry. */
   async setCurrentLeaf(input: SetSessionLeafInput): Promise<SessionDataEntry> {
     const entries = await this.repository.listSessionData(input.sessionId);
-    const targetEntry = entries.find((entry) => entry.id === input.targetEntryId && entry.type !== "leaf");
+    const targetEntry = entries.find(
+      (entry) => entry.id === input.targetEntryId && entry.type !== "leaf",
+    );
 
     if (!targetEntry) {
       throw new SessionEntryNotFoundError(input.targetEntryId);
@@ -196,7 +208,10 @@ export class SessionManager {
   }
 
   /** Loads session data and resolves the active message context for an LLM call. */
-  async buildSessionContext(input: { readonly sessionId: string; readonly model?: Model }): Promise<AgentMessage[]> {
+  async buildSessionContext(input: {
+    readonly sessionId: string;
+    readonly model?: Model;
+  }): Promise<AgentMessage[]> {
     const entries = await this.repository.listSessionData(input.sessionId);
     return buildSessionContext(entries, {
       model: input.model,
@@ -223,12 +238,16 @@ export class SessionManager {
 }
 
 /** Creates the persisted payload for a leaf pointer entry. */
-export function createLeafPointerPayload(entryId: string | null): LeafPointerPayload {
+export function createLeafPointerPayload(
+  entryId: string | null,
+): LeafPointerPayload {
   return { entryId };
 }
 
 /** Resolves the current leaf id by replaying append and leaf-pointer operations. */
-export function resolveCurrentLeafId(entries: ReadonlyArray<SessionDataEntry>): string | null {
+export function resolveCurrentLeafId(
+  entries: ReadonlyArray<SessionDataEntry>,
+): string | null {
   const sortedEntries = sortSessionEntries(entries);
   const knownEntryIds = new Set(sortedEntries.map((entry) => entry.id));
   let leafId: string | null = null;
@@ -260,7 +279,9 @@ export function resolveCurrentLeafId(entries: ReadonlyArray<SessionDataEntry>): 
 }
 
 /** Resolves the current leaf and root-to-leaf history path for a session tree. */
-export function resolveSessionTreeState(entries: ReadonlyArray<SessionDataEntry>): SessionTreeState {
+export function resolveSessionTreeState(
+  entries: ReadonlyArray<SessionDataEntry>,
+): SessionTreeState {
   const sortedEntries = sortSessionEntries(entries);
   const leafId = resolveCurrentLeafId(sortedEntries);
   const path = buildSessionEntryPath(sortedEntries, leafId);
@@ -345,7 +366,9 @@ export function buildSessionContext(
   return messages;
 }
 
-function sortSessionEntries(entries: ReadonlyArray<SessionDataEntry>): SessionDataEntry[] {
+function sortSessionEntries(
+  entries: ReadonlyArray<SessionDataEntry>,
+): SessionDataEntry[] {
   return [...entries].sort((left, right) => {
     if (left.sequence !== right.sequence) {
       return left.sequence - right.sequence;
@@ -361,7 +384,9 @@ function sortSessionEntries(entries: ReadonlyArray<SessionDataEntry>): SessionDa
   });
 }
 
-function parseLeafPointerPayload(payload: Record<string, unknown>): string | null | undefined {
+function parseLeafPointerPayload(
+  payload: Record<string, unknown>,
+): string | null | undefined {
   for (const key of ["entryId", "leafId", "targetEntryId", "targetId"]) {
     const value = payload[key];
 
@@ -377,7 +402,10 @@ function parseLeafPointerPayload(payload: Record<string, unknown>): string | nul
   return undefined;
 }
 
-function extractCompactionMessages(entry: SessionDataEntry, options: BuildSessionContextOptions): AgentMessage[] {
+function extractCompactionMessages(
+  entry: SessionDataEntry,
+  options: BuildSessionContextOptions,
+): AgentMessage[] {
   const payloadMessages = entry.payload.messages;
 
   if (Array.isArray(payloadMessages)) {
@@ -401,8 +429,15 @@ function extractCompactionMessages(entry: SessionDataEntry, options: BuildSessio
   return summaryMessage ? [summaryMessage] : [];
 }
 
-function extractSummaryMessage(entry: SessionDataEntry, options: BuildSessionContextOptions): AgentMessage | null {
-  const summary = extractStringPayload(entry.payload, ["summary", "content", "text"]);
+function extractSummaryMessage(
+  entry: SessionDataEntry,
+  options: BuildSessionContextOptions,
+): AgentMessage | null {
+  const summary = extractStringPayload(entry.payload, [
+    "summary",
+    "content",
+    "text",
+  ]);
 
   if (!summary) {
     return null;
@@ -414,11 +449,18 @@ function extractSummaryMessage(entry: SessionDataEntry, options: BuildSessionCon
   };
 }
 
-function extractSessionEntryMessage(entry: SessionDataEntry, model?: Model): AgentMessage | null {
+function extractSessionEntryMessage(
+  entry: SessionDataEntry,
+  model?: Model,
+): AgentMessage | null {
   return extractMessageValue(entry.payload.message, entry, model);
 }
 
-function extractMessageValue(value: unknown, entry: SessionDataEntry, model?: Model): AgentMessage | null {
+function extractMessageValue(
+  value: unknown,
+  entry: SessionDataEntry,
+  model?: Model,
+): AgentMessage | null {
   if (!isRecord(value) || typeof value.role !== "string") {
     return null;
   }
@@ -458,7 +500,8 @@ function extractAssistantMessage(
   }
 
   const api = typeof value.api === "string" ? value.api : model?.api;
-  const provider = typeof value.provider === "string" ? value.provider : model?.provider;
+  const provider =
+    typeof value.provider === "string" ? value.provider : model?.provider;
   const modelId = typeof value.model === "string" ? value.model : model?.id;
 
   if (!api || !provider || !modelId) {
@@ -471,17 +514,25 @@ function extractAssistantMessage(
     api,
     provider,
     model: modelId,
-    responseModel: typeof value.responseModel === "string" ? value.responseModel : undefined,
-    responseId: typeof value.responseId === "string" ? value.responseId : undefined,
-    diagnostics: Array.isArray(value.diagnostics) ? (value.diagnostics as AssistantMessage["diagnostics"]) : undefined,
+    responseModel:
+      typeof value.responseModel === "string" ? value.responseModel : undefined,
+    responseId:
+      typeof value.responseId === "string" ? value.responseId : undefined,
+    diagnostics: Array.isArray(value.diagnostics)
+      ? (value.diagnostics as AssistantMessage["diagnostics"])
+      : undefined,
     usage: isUsage(value.usage) ? value.usage : ZERO_USAGE,
     stopReason: normalizeStopReason(value.stopReason),
-    errorMessage: typeof value.errorMessage === "string" ? value.errorMessage : undefined,
+    errorMessage:
+      typeof value.errorMessage === "string" ? value.errorMessage : undefined,
     timestamp: readTimestamp(value, entry),
   };
 }
 
-function extractToolResultMessage(value: Record<string, unknown>, entry: SessionDataEntry): ToolResultMessage | null {
+function extractToolResultMessage(
+  value: Record<string, unknown>,
+  entry: SessionDataEntry,
+): ToolResultMessage | null {
   if (
     typeof value.toolCallId !== "string" ||
     typeof value.toolName !== "string" ||
@@ -502,7 +553,9 @@ function extractToolResultMessage(value: Record<string, unknown>, entry: Session
   };
 }
 
-function extractAssistantContent(value: unknown): AssistantMessage["content"] | null {
+function extractAssistantContent(
+  value: unknown,
+): AssistantMessage["content"] | null {
   if (typeof value === "string") {
     return [{ type: "text", text: value }];
   }
@@ -515,11 +568,15 @@ function extractAssistantContent(value: unknown): AssistantMessage["content"] | 
   return content.length === value.length ? content : null;
 }
 
-function isSupportedUserContent(value: unknown): value is UserMessage["content"] {
+function isSupportedUserContent(
+  value: unknown,
+): value is UserMessage["content"] {
   return typeof value === "string" || isContentPartArray(value);
 }
 
-function isToolResultContent(value: unknown): value is ToolResultMessage["content"] {
+function isToolResultContent(
+  value: unknown,
+): value is ToolResultMessage["content"] {
   return isContentPartArray(value);
 }
 
@@ -543,7 +600,9 @@ function isContentPart(value: unknown): value is ContentPart {
   return false;
 }
 
-function isAssistantContentPart(value: unknown): value is AssistantMessage["content"][number] {
+function isAssistantContentPart(
+  value: unknown,
+): value is AssistantMessage["content"][number] {
   if (!isRecord(value) || typeof value.type !== "string") {
     return false;
   }
@@ -596,11 +655,19 @@ function normalizeStopReason(value: unknown): StopReason {
   return "unknown";
 }
 
-function readTimestamp(value: Record<string, unknown>, entry: SessionDataEntry): number {
-  return typeof value.timestamp === "number" ? value.timestamp : entry.createdAt.getTime();
+function readTimestamp(
+  value: Record<string, unknown>,
+  entry: SessionDataEntry,
+): number {
+  return typeof value.timestamp === "number"
+    ? value.timestamp
+    : entry.createdAt.getTime();
 }
 
-function extractStringPayload(payload: Record<string, unknown>, keys: ReadonlyArray<string>): string | null {
+function extractStringPayload(
+  payload: Record<string, unknown>,
+  keys: ReadonlyArray<string>,
+): string | null {
   for (const key of keys) {
     const value = payload[key];
 

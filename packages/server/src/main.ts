@@ -1,10 +1,21 @@
 import { randomUUID } from "node:crypto";
 import { createServer } from "node:http";
-import { createAgentRuntime } from "@dentaltrip-ai/agent-runtime";
-import { AgentService } from "@dentaltrip-ai/core/agent";
-import { createInMemoryEventBus, type EventListenerFailure } from "@dentaltrip-ai/core/events";
-import { SessionForbiddenError, SessionNotFoundError, SessionUseCases } from "@dentaltrip-ai/core/session";
-import { createDatabaseClient, createDatabaseRepositories, runMigrations } from "@dentaltrip-ai/database";
+import { createAgentRuntime } from "@chatbot-experiments/agent-runtime";
+import { AgentService } from "@chatbot-experiments/core/agent";
+import {
+  createInMemoryEventBus,
+  type EventListenerFailure,
+} from "@chatbot-experiments/core/events";
+import {
+  SessionForbiddenError,
+  SessionNotFoundError,
+  SessionUseCases,
+} from "@chatbot-experiments/core/session";
+import {
+  createDatabaseClient,
+  createDatabaseRepositories,
+  runMigrations,
+} from "@chatbot-experiments/database";
 import { createApp } from "./app.ts";
 import { loadEnv } from "./env.ts";
 import { RealtimeNotifier } from "./realtime/realtime-notifier.ts";
@@ -14,7 +25,8 @@ async function start(): Promise<void> {
   const env = loadEnv();
   await runMigrations(env.databaseUrl);
   const database = await createDatabaseClient(env.databaseUrl);
-  const { sessionRepository, agentRunStore } = createDatabaseRepositories(database);
+  const { sessionRepository, agentRunStore } =
+    createDatabaseRepositories(database);
   function reportListenerFailure({ event, error }: EventListenerFailure): void {
     console.error(`${event.type} listener failed:`, error);
   }
@@ -57,7 +69,10 @@ async function start(): Promise<void> {
         },
       })
       .catch((error: unknown) => {
-        console.error(`[agent] startRun failed for session ${sessionId}:`, error);
+        console.error(
+          `[agent] startRun failed for session ${sessionId}:`,
+          error,
+        );
       });
   }
 
@@ -68,7 +83,10 @@ async function start(): Promise<void> {
         await sessionUseCases.getSession({ sessionId, userId });
         return true;
       } catch (error) {
-        if (error instanceof SessionForbiddenError || error instanceof SessionNotFoundError) {
+        if (
+          error instanceof SessionForbiddenError ||
+          error instanceof SessionNotFoundError
+        ) {
           return false;
         }
 

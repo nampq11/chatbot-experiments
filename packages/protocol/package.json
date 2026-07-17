@@ -1,5 +1,5 @@
 {
-  "name": "@dentaltrip-ai/protocol",
+  "name": "@chatbot-experiments/protocol",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -37,7 +37,7 @@
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
-    "@dentaltrip-ai/typescript-config": "workspace:*",
+    "@chatbot-experiments/typescript-config": "workspace:*",
     "typescript": "5.9.2"
   },
   "dependencies": {

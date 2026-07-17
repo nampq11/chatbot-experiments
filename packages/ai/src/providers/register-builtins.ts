@@ -1,9 +1,12 @@
 import { registerApiProvider } from "../api-registry.js";
-import { type AzureOpenAIResponsesOptions, azureOpenAIResponsesProvider } from "./azure-openai-responses.js";
+import {
+  type AzureOpenAIResponsesOptions,
+  azureOpenAIResponsesProvider,
+} from "./azure-openai-responses.js";
 
 let registered = false;
 
-/** Registers built-in DentalTrip AI provider adapters once. */
+/** Registers built-in Chatbot Experiments provider adapters once. */
 export function registerBuiltinProviders(): void {
   if (registered) {
     return;

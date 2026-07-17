@@ -1,4 +1,8 @@
-import type { DomainEvent, EventBus, EventListenerFailure } from "@dentaltrip-ai/core/events";
+import type {
+  DomainEvent,
+  EventBus,
+  EventListenerFailure,
+} from "@chatbot-experiments/core/events";
 
 type DomainEventListener = (event: DomainEvent) => void | Promise<void>;
 
@@ -12,12 +16,15 @@ export interface InMemoryEventBusOptions {
 }
 
 /** Creates an in-process event bus for domain events. */
-export function createInMemoryEventBus(options: InMemoryEventBusOptions = {}): EventBus {
+export function createInMemoryEventBus(
+  options: InMemoryEventBusOptions = {},
+): EventBus {
   const { onFailure } = options;
   const listeners = new Map<DomainEvent["type"], Set<DomainEventListener>>();
 
   const reportFailure = (event: DomainEvent, error: unknown): void => {
-    const normalized = error instanceof Error ? error : new Error(String(error));
+    const normalized =
+      error instanceof Error ? error : new Error(String(error));
     onFailure?.({ event, error: normalized });
   };
 

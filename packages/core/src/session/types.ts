@@ -1,4 +1,7 @@
-import type { MessageRole, SessionStatus } from "@dentaltrip-ai/protocol/session";
+import type {
+  MessageRole,
+  SessionStatus,
+} from "@chatbot-experiments/protocol/session";
 
 export type { MessageRole, SessionStatus };
 

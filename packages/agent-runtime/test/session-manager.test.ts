@@ -1,5 +1,5 @@
-import type { Message as AgentMessage, Model } from "@dentaltrip-ai/ai";
-import type { SessionDataEntry } from "@dentaltrip-ai/core/session";
+import type { Message as AgentMessage, Model } from "@chatbot-experiments/ai";
+import type { SessionDataEntry } from "@chatbot-experiments/core/session";
 import { describe, expect, it } from "vitest";
 import {
   buildSessionContext,
@@ -52,7 +52,9 @@ function createMemoryRepository(): SessionManagerRepository & {
       return entries.filter((entry) => entry.sessionId === sessionId);
     },
     async appendSessionData(input): Promise<SessionDataEntry> {
-      const sessionEntries = entries.filter((entry) => entry.sessionId === input.sessionId);
+      const sessionEntries = entries.filter(
+        (entry) => entry.sessionId === input.sessionId,
+      );
       const previousEntry = sessionEntries.at(-1);
       const entry: SessionDataEntry = {
         id: input.id,
@@ -130,17 +132,32 @@ describe("SessionManager", () => {
 
     expect(firstEntry).toMatchObject({ id: "entry-1", parentId: null });
     expect(secondEntry).toMatchObject({ id: "entry-2", parentId: "entry-1" });
-    expect(repository.entries.map((entry) => entry.type)).toEqual(["message", "leaf", "message", "leaf"]);
+    expect(repository.entries.map((entry) => entry.type)).toEqual([
+      "message",
+      "leaf",
+      "message",
+      "leaf",
+    ]);
     expect(repository.entries.at(1)?.payload).toEqual({ entryId: "entry-1" });
     expect(repository.entries.at(3)?.payload).toEqual({ entryId: "entry-2" });
-    await expect(manager.getCurrentLeafId("session-1")).resolves.toBe("entry-2");
+    await expect(manager.getCurrentLeafId("session-1")).resolves.toBe(
+      "entry-2",
+    );
   });
 
   it("branches to an earlier entry without modifying history", async () => {
     const repository = createMemoryRepository();
     const manager = new SessionManager({
       repository,
-      generateId: createIdGenerator(["entry-1", "leaf-1", "entry-2", "leaf-2", "branch-leaf", "entry-3", "leaf-3"]),
+      generateId: createIdGenerator([
+        "entry-1",
+        "leaf-1",
+        "entry-2",
+        "leaf-2",
+        "branch-leaf",
+        "entry-3",
+        "leaf-3",
+      ]),
     });
 
     await manager.appendMessage({
@@ -164,8 +181,12 @@ describe("SessionManager", () => {
       message: { role: "user", content: "new branch", timestamp: 3 },
     });
 
-    await expect(manager.getCurrentLeafId("session-1")).resolves.toBe("entry-3");
-    await expect(manager.buildSessionContext({ sessionId: "session-1" })).resolves.toEqual([
+    await expect(manager.getCurrentLeafId("session-1")).resolves.toBe(
+      "entry-3",
+    );
+    await expect(
+      manager.buildSessionContext({ sessionId: "session-1" }),
+    ).resolves.toEqual([
       { role: "user", content: "root", timestamp: 1 },
       { role: "user", content: "new branch", timestamp: 3 },
     ]);
@@ -306,7 +327,8 @@ describe("buildSessionContext", () => {
     expect(buildSessionContext(entries, { model: TEST_MODEL })).toEqual([
       {
         role: "system",
-        content: "Conversation summary so far:\nThe user asked about appointments.",
+        content:
+          "Conversation summary so far:\nThe user asked about appointments.",
       },
       { role: "user", content: "continue", timestamp: 4 },
     ]);

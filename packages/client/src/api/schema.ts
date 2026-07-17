@@ -4,14 +4,19 @@ import {
   paginatedSessionsResponseSchema,
   sessionArraySchema,
   sessionSchema,
-} from "@dentaltrip-ai/protocol/session";
+} from "@chatbot-experiments/protocol/session";
 import type { z } from "zod";
 
 /**
  * Parses untrusted API JSON and returns an explicit fallback when the response
  * drifts from the expected schema.
  */
-export function parseWithFallback<T>(schema: z.ZodType<T>, value: unknown, fallback: T, context: string): T {
+export function parseWithFallback<T>(
+  schema: z.ZodType<T>,
+  value: unknown,
+  fallback: T,
+  context: string,
+): T {
   const parsed = schema.safeParse(value);
 
   if (parsed.success) {
@@ -24,4 +29,10 @@ export function parseWithFallback<T>(schema: z.ZodType<T>, value: unknown, fallb
 
 const paginatedSessionsSchema = paginatedSessionsResponseSchema;
 
-export { messageArraySchema, messageSchema, paginatedSessionsSchema, sessionArraySchema, sessionSchema };
+export {
+  messageArraySchema,
+  messageSchema,
+  paginatedSessionsSchema,
+  sessionArraySchema,
+  sessionSchema,
+};

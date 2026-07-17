@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DentalTrip AI Chat",
-  description: "Standalone DentalTrip AI chat prototype.",
+  title: "Chatbot Experiments Chat",
+  description: "Standalone Chatbot Experiments chat prototype.",
 };
 
 export const viewport: Viewport = {
@@ -31,7 +31,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-dvh" suppressHydrationWarning>
-      <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased`}>
+      <body
+        className={`${inter.variable} ${geistMono.variable} font-sans antialiased`}
+      >
         <Providers>{children}</Providers>
       </body>
     </html>
