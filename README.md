@@ -1,4 +1,4 @@
-# Chatbot Prototype
+# Chatbot Experiments
 
 Standalone DentalTrip AI chat stack extracted from `/home/nampq/workspace/src/dentaltrip/dentaltrip-ai`.
 
